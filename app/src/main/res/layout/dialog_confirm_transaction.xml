@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/bg_rounded_dialog">
+
+    <androidx.appcompat.widget.AppCompatCheckedTextView
+        android:id="@+id/tvConfirmTransaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="25dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:text="@string/confirm_transaction"/>
+
+    <androidx.appcompat.widget.AppCompatCheckedTextView
+        android:id="@+id/tvSenderAdd"
+        android:layout_width="58dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvConfirmTransaction"
+        android:layout_marginTop="45dp"
+        android:textSize="10dp"
+        android:textColor="@color/black"
+        tools:text="0xwedrf2rfr4r4te5f"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow"
+        android:layout_marginTop="46dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvConfirmTransaction"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatCheckedTextView
+        android:id="@+id/tvReceiptAdd"
+        android:layout_width="58dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvConfirmTransaction"
+        android:layout_marginTop="45dp"
+        android:textSize="10dp"
+        android:textColor="@color/black"
+        tools:text="0xwedrf2rfr4r4te5f"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNetwork"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivArrow"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_layout_eth_network"
+        android:drawableLeft="@drawable/ic_wifi"
+        android:drawablePadding="5dp"
+        android:text="Ethereum Testnet"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvNetwork"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAmountToSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/amount_to_send"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAmountValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:textColor="#5C6C7F"
+        android:textSize="14sp"
+        tools:text="0.0096 ETH"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvExchangePrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#5C6C7F"
+        android:textSize="12sp"
+        tools:text="~2.61356 USD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAmountValue" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMaxFee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="@string/max_transaction_fee"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAmountToSend" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTransactionValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="#5C6C7F"
+        android:textSize="14sp"
+        tools:text="2.35 USD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvExchangePrice" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvExchangeTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#5C6C7F"
+        android:textSize="12sp"
+        tools:text="(In < 30 Seconds)"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTransactionValue" />
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvExchangeTime"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTotalCost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/total_cost"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTotalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        tools:text="0.0026457689 ETH"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTotalCostInUSD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#5C6C7F"
+        android:textSize="12sp"
+        tools:text="~5.34 USD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTotalAmount" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/confirm"
+        android:layout_marginTop="62dp"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_button"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@+id/tvTotalCostInUSD"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/cancel"
+        android:layout_marginTop="22dp"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_button"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@+id/btnConfirm"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

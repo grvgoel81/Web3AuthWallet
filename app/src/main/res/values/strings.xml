@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Web3Auth-Wallet-sample</string>
+    <string name="login_heading">Select network and Blockchain to login</string>
+    <string name="select_network">Web3Auth Network</string>
+    <string name="select_blockchain">Blockchain</string>
+    <string name="onboarding_header">Welcome onboard</string>
+    <string name="onboarding_sub_header">Select how you would like to continue</string>
+    <string name="continue_with">Continue with</string>
+    <string name="continue_with_email">Continue with Email</string>
+    <string name="email">Email</string>
+    <string name="address">Address</string>
+    <string name="account_details">Account Details</string>
+    <string name="account_balance">Account Balance</string>
+    <string name="transfer_assets">Transfer assets</string>
+    <string name="sign_message_demo">Sign Message (Demo)</string>
+    <string name="message">Message</string>
+    <string name="enter_message">Enter your message here</string>>
+    <string name="send_to">Send to</string>
+    <string name="select_item_transfer">Select item to transfer</string>
+    <string name="sign_message">Sign Message</string>
+    <string name="amount">Amount</string>
+    <string name="send_all">Send all</string>
+    <string name="edit">Edit</string>
+    <string name="max_transaction_fee">Max Transaction Fee</string>
+    <string name="total_cost">Total cost</string>
+    <string name="transfer">Transfer</string>
+    <string name="transaction_placed">Transaction Placed</string>
+    <string name="transaction_failed">Transaction Failed</string>
+    <string name="transaction_success">Transaction Success</string>
+    <string name="transaction_pending">Transaction Pending</string>
+    <string name="try_again">Try again now</string>
+    <string name="view_transaction_status"><u>View transaction’s status on Etherscan</u></string>
+    <string name="sign_failed">Sign Failed</string>
+    <string name="sign_success">Sign Successfully</string>
+    <string name="copy"><u>Copy</u></string>
+    <string name="confirm_transaction">Confirm transaction</string>
+    <string name="amount_to_send">Amount to send</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="f">F</string>
+    <string name="web3auth_project_id">BASdZxp5tWqPGkzbOU4VMJsnz8QOpJ2pyxf6kZcuxI8AJ1gsOw5MgbW96RpAAx_Kk-5p4rhOopPhCa9kR_9mKpE</string>
+
+
+    <string-array name="networks">
+        <item>Mainnet</item>
+        <item>Testnet</item>
+        <item>Cyan</item>
+    </string-array>
+
+    <string-array name="blockchains">
+        <item>Ethereum</item>
+        <item>Solana</item>
+        <item>Binance</item>
+        <item>Polygon</item>
+    </string-array>
+
+    <string-array name="networkAddress">
+        <item>Eth Address</item>
+        <item>Solana Address</item>
+        <item>Binance Address</item>
+        <item>Polygon Address</item>
+    </string-array>
+</resources>

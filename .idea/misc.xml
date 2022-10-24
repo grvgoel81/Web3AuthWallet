@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/background_spinner.xml" value="0.153" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_button.xml" value="0.1985" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_circular.xml" value="0.1435" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_edit_text.xml" value="0.178" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_edittext_network.xml" value="0.151" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_layout.xml" value="0.1595" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_layout_eth_network.xml" value="0.136" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_layout_grey.xml" value="0.1595" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_layout_tv_grey.xml" value="0.209" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_layout_white.xml" value="0.1595" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_onboarding_gradient.xml" value="0.178" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_rounded_dialog.xml" value="0.1835" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_spinner.xml" value="0.153" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/bg_spinner_white.xml" value="0.2085" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/ic_expand_full_login.xml" value="0.1435" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/ic_facebook.xml" value="0.1435" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/ic_iv_transaction_success.xml" value="0.1835" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1435" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/ic_transaction_failed.xml" value="0.1835" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/drawable/iv_google.xml" value="0.1435" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activity_login.xml" value="0.264" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activity_onboarding.xml" value="0.23114035087719298" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activity_splash.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activity_transfer_asset.xml" value="0.22521367521367522" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activity_user_detail.xml" value="0.22435897435897437" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/activtity_user_details.xml" value="0.22435897435897437" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/dialog_confirm_transaction.xml" value="0.22521367521367522" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/dialog_qr_code.xml" value="0.22521367521367522" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/item_dropdown.xml" value="0.22521367521367522" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/popup_sign_transaction.xml" value="0.22521367521367522" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/layout/popup_transaction.xml" value="0.22435897435897437" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/mipmap-xhdpi/ic_launcher.xml" value="0.178" />
+        <entry key="..\:/Users/grvgo/AndroidStudioProjects/Web3AuthWalletsample/app/src/main/res/mipmap-xhdpi/ic_launcher_round.xml" value="0.178" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

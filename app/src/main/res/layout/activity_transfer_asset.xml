@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.12" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/guideline">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@mipmap/ic_arrow_left"
+            android:layout_marginTop="48dp"
+            android:layout_marginStart="34dp"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="16dp"
+            android:text="@string/transfer_assets"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/ivBack"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingStart="53dp"
+        android:paddingEnd="53dp"
+        android:paddingTop="20dp"
+        android:background="@color/activity_bg_color"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guideline">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNetwork"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_item_transfer"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginTop="28dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/rlBlockchainSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNetwork">
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/spBlockChain"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_centerHorizontal="true"
+                android:entries="@array/blockchains" />
+
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSendTo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send_to"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/rlBlockchainSpinner"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_scan"
+            android:layout_marginTop="24dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:layout_constraintTop_toBottomOf="@+id/rlBlockchainSpinner"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etBlockchainAddress"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="@string/address"
+            android:paddingLeft="20sp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_edit_text"
+            app:layout_constraintTop_toBottomOf="@+id/tvSendTo"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <RelativeLayout
+            android:id="@+id/rlAddressSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etBlockchainAddress">
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_centerHorizontal="true"
+                android:entries="@array/networkAddress" />
+
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/amount"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/rlAddressSpinner"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSendAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send_all"
+            android:textSize="16dp"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/purple_500"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rlAddressSpinner" />
+
+        <FrameLayout
+            android:id="@+id/flAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSendAll">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="0.00"
+                android:paddingLeft="20sp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_edit_text"
+                app:layout_constraintTop_toBottomOf="@+id/tvSendTo"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_layout_tv_grey"
+                android:text="ETH"
+                android:layout_marginStart="137dp"
+                android:layout_marginTop="12dp"
+                android:textColor="#6F717A" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_layout_tv_grey"
+                android:text="USD"
+                android:layout_marginStart="210dp"
+                android:layout_marginTop="12dp"
+                android:textColor="#6F717A" />
+
+
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTransactionFee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/max_transaction_fee"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/flAmount"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit"
+            android:textSize="16dp"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/purple_500"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/flAmount" />
+
+        <FrameLayout
+            android:id="@+id/flTransaction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTransactionFee">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Upto 0.00041157"
+                android:paddingLeft="20sp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_edit_text"
+                app:layout_constraintTop_toBottomOf="@+id/tvSendTo"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edittext_network"
+                android:text="ETH"
+                android:layout_marginStart="210dp"
+                android:layout_marginTop="12dp" />
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTotalCost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/total_cost"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/flTransaction"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTotalAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.000096 ETH"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/tvTotalCost"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvExchangePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="= 0.012 USD"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/tvTotalAmount"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvExchangePrice"
+            android:layout_marginTop="30dp"
+            android:text="@string/transfer"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_button"
+            android:foreground="?android:attr/selectableItemBackground" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

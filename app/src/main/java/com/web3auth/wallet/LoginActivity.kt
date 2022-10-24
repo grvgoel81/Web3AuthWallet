@@ -1,0 +1,51 @@
+package com.web3auth.wallet
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
+import com.web3auth.wallet.utils.*
+
+class LoginActivity: AppCompatActivity() {
+
+    private lateinit var networkSpinner: AutoCompleteTextView
+    private lateinit var blockChainSpinner: AutoCompleteTextView
+    private lateinit var networks: Array<String>
+    private lateinit var blockchains: Array<String>
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
+        setContentView(R.layout.activity_login)
+        setUpSpinner()
+        findViewById<AppCompatButton>(R.id.btnLogin).setOnClickListener {
+            startActivity(Intent(this@LoginActivity, OnBoardingActivity::class.java))
+            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ISLOGGEDIN, true)
+            finish()
+        }
+    }
+
+    private fun setUpSpinner() {
+        networks = resources.getStringArray(R.array.networks)
+        blockchains = resources.getStringArray(R.array.blockchains)
+
+        networkSpinner = findViewById(R.id.spNetwork)
+        val networkAdapter: ArrayAdapter<String> =
+            ArrayAdapter(this, R.layout.item_dropdown, networks)
+        networkSpinner.setAdapter(networkAdapter)
+        networkSpinner.setOnItemClickListener { _, _, position, _ ->
+            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(NETWORK, networks[position])
+        }
+
+        blockChainSpinner = findViewById(R.id.spBlockChain)
+        val adapter: ArrayAdapter<String> =
+            ArrayAdapter(this, R.layout.item_dropdown, blockchains)
+        blockChainSpinner.setAdapter(adapter)
+        blockChainSpinner.setOnItemClickListener { _, view, position, id ->
+            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(BLOCKCHAIN, blockchains[position])
+        }
+    }
+}
