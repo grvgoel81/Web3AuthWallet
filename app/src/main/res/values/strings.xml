@@ -39,6 +39,8 @@
     <string name="cancel">Cancel</string>
     <string name="f">F</string>
     <string name="web3auth_project_id">BASdZxp5tWqPGkzbOU4VMJsnz8QOpJ2pyxf6kZcuxI8AJ1gsOw5MgbW96RpAAx_Kk-5p4rhOopPhCa9kR_9mKpE</string>
+    <string name="ethereum">Ethereum</string>
+    <string name="solana">Solana</string>
 
 
     <string-array name="networks">

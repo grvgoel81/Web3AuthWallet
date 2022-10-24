@@ -14,7 +14,7 @@ object SolanaManager {
 
     private lateinit var solanaWallet: SolanaWallet
 
-    fun createWallet(network: Network, message: String, passphrase: String? = null) {
+    fun createWallet(network: Network, message: String? = null, passphrase: String? = null) {
         val network = Network.TESTNET
 
         // create wallet

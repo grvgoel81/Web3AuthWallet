@@ -2,6 +2,7 @@ package com.web3auth.wallet.utils
 
 import com.web3auth.core.Web3Auth
 import org.torusresearch.fetchnodedetails.types.TorusNetwork
+import com.paymennt.crypto.bip32.Network
 
 object NetworkUtils {
 
@@ -18,6 +19,14 @@ object NetworkUtils {
             "Mainnet" -> TorusNetwork.MAINNET
             "Testnet" -> TorusNetwork.TESTNET
             else  -> TorusNetwork.CYAN
+        }
+    }
+
+    fun getSolanaNetwork(network:String): Network {
+        return when(network) {
+            "Mainnet" -> Network.MAINNET
+            "Testnet" -> Network.TESTNET
+            else  -> Network.TESTNET
         }
     }
 }
