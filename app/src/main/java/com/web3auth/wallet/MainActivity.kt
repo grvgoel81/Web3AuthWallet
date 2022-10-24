@@ -58,12 +58,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-        setData()
+        selectedNetwork = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
+        configureWeb3j()
         configureWeb3Auth()
+        setData()
         setUpListeners()
     }
 
     private fun configureWeb3Auth() {
+
         Web3Auth(
             Web3AuthOptions(context = this,
                 clientId = getString(R.string.web3auth_project_id),
@@ -120,14 +123,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setData() {
         val blockChain = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
-        selectedNetwork = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
         findViewById<AppCompatTextView>(R.id.tvNetwork).text = blockChain.plus(" ").plus(selectedNetwork)
 
-        if(selectedNetwork == getString(R.string.ethereum)) {
+        /*if(blockChain == getString(R.string.ethereum)) {
             EthManager.configureWeb3j()
         } else {
             SolanaManager.createWallet(NetworkUtils.getSolanaNetwork(selectedNetwork))
-        }
+        }*/
     }
 
     private fun getEthAddress(web3AuthResponse: Web3AuthResponse) {
@@ -143,7 +145,26 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 findViewById<AppCompatTextView>(R.id.tvAddress).text = web3Address.take(3).plus("...").plus(web3Address.takeLast(4))
                 Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ETH_Address, web3Address)
-                EthManager.retrieveBalance(web3Address)
+                retrieveBalance(web3Address)
+            }
+        }
+    }
+
+    private fun retrieveBalance(publicAddress: String) {
+        //get wallet's balance
+        Executors.newSingleThreadExecutor().execute {
+            try {
+                web3Balance = web3.ethGetBalance(
+                    publicAddress,
+                    DefaultBlockParameterName.LATEST
+                ).sendAsync()
+                    .get()
+            } catch (e: Exception) {
+                toast("balance failed")
+            }
+            runOnUiThread {
+                val tvBalance = findViewById<AppCompatTextView>(R.id.tvBalance)
+                tvBalance.text = web3Balance.balance.toString()
             }
         }
     }
