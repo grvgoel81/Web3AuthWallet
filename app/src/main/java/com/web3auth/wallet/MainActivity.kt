@@ -10,22 +10,29 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.os.postDelayed
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import com.web3auth.core.Web3Auth
+import com.web3auth.core.getCustomTabsBrowsers
+import com.web3auth.core.getDefaultBrowser
 import com.web3auth.core.types.Web3AuthOptions
 import com.web3auth.core.types.Web3AuthResponse
 import com.web3auth.core.types.WhiteLabelData
+import com.web3auth.wallet.api.ApiHelper
+import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.utils.*
-import org.torusresearch.fetchnodedetails.types.TorusNetwork
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionEncoder
@@ -33,16 +40,14 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.response.EthGetBalance
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount
-import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
-import org.web3j.tx.Transfer
 import org.web3j.utils.Convert
 import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.text.DecimalFormat
 import java.util.concurrent.Executors
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,15 +55,20 @@ class MainActivity : AppCompatActivity() {
     private var web3AuthResponse: Web3AuthResponse? = null
     private lateinit var web3: Web3j
     private lateinit var credentials: Credentials
-    private lateinit var web3Address: String
+    private lateinit var publicAddress: String
     private lateinit var web3Balance: EthGetBalance
     private lateinit var selectedNetwork: String
+    private lateinit var tvExchangeRate: AppCompatTextView
+    private lateinit var tvPriceInUSD: AppCompatTextView
+    private lateinit var priceInUSD: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-        selectedNetwork = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
+        selectedNetwork =
+            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
+                .toString()
         configureWeb3j()
         configureWeb3Auth()
         setData()
@@ -66,11 +76,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureWeb3Auth() {
-
         Web3Auth(
-            Web3AuthOptions(context = this,
+            Web3AuthOptions(
+                context = this,
                 clientId = getString(R.string.web3auth_project_id),
-                network =  NetworkUtils.getWebAuthNetwork(selectedNetwork),
+                network = NetworkUtils.getWebAuthNetwork(selectedNetwork),
                 redirectUrl = Uri.parse("torusapp://org.torusresearch.web3authexample/redirect"),
                 whiteLabel = WhiteLabelData(
                     "Web3Auth Sample App", null, null, "en", true,
@@ -82,7 +92,8 @@ class MainActivity : AppCompatActivity() {
         ).also { web3Auth = it }
 
         web3Auth.setResultUrl(intent.data)
-        web3AuthResponse = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
+        web3AuthResponse =
+            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
         web3AuthResponse?.let { getEthAddress(it) }
 
         findViewById<AppCompatTextView>(R.id.tvName).text = "Welcome ".plus(
@@ -92,7 +103,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureWeb3j() {
-        val url = "https://small-long-brook.ropsten.quiknode.pro/e2fd2eb01412e80623787d1c40094465aa67624a" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
+        val url =
+            "https://rpc-mumbai.maticvigil.com/" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
         web3 = Web3j.build(HttpService(url))
         try {
             val clientVersion: Web3ClientVersion = web3.web3ClientVersion().sendAsync().get()
@@ -105,25 +117,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpListeners() {
+        tvExchangeRate = findViewById(R.id.tvExchangeRate)
+        tvPriceInUSD = findViewById(R.id.tvPriceInUSD)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
             startActivity(Intent(this@MainActivity, TransferAssetsActivity::class.java))
         }
-
         findViewById<AppCompatImageView>(R.id.ivLogout).setOnClickListener { logout() }
         findViewById<AppCompatTextView>(R.id.tvLogout).setOnClickListener { logout() }
-
         findViewById<AppCompatImageView>(R.id.ivQRCode).setOnClickListener {
-            showQR_Dialog(web3Address)
+            showQRDialog(publicAddress)
         }
 
         findViewById<AppCompatButton>(R.id.btnSign).setOnClickListener {
-            showSignTransactionDialog(false, "0xsdfgfgsdfngsdfjhdbfknasvhbksdnjkadbsg2345hbhb3b45jbbb4b3bh5j3hhh3khjh3knjj3nkh5jh3kh6hk3jbg5jn4jb6j4")
+            //signMessage()
+            showSignTransactionDialog(false, "")
         }
     }
 
     private fun setData() {
-        val blockChain = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
-        findViewById<AppCompatTextView>(R.id.tvNetwork).text = blockChain.plus(" ").plus(selectedNetwork)
+        val blockChain =
+            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
+        findViewById<AppCompatTextView>(R.id.tvNetwork).text =
+            blockChain.plus(" ").plus(selectedNetwork)
+
+        findViewById<AppCompatTextView>(R.id.tvViewTransactionStatus).setOnClickListener {
+            openCustomTabs("https://mumbai.polygonscan.com/")
+        }
+
+        getCurrencyPriceInUSD("ETH", "USD")
 
         /*if(blockChain == getString(R.string.ethereum)) {
             EthManager.configureWeb3j()
@@ -134,24 +155,39 @@ class MainActivity : AppCompatActivity() {
 
     private fun getEthAddress(web3AuthResponse: Web3AuthResponse) {
         val authArgs = CustomAuthArgs(NetworkUtils.getTorusNetwork(selectedNetwork))
-        authArgs.networkUrl = "https://small-long-brook.ropsten.quiknode.pro/e2fd2eb01412e80623787d1c40094465aa67624a"
+        authArgs.networkUrl =
+            "https://small-long-brook.ropsten.quiknode.pro/e2fd2eb01412e80623787d1c40094465aa67624a"
         // Initialize CustomAuth
         var torusSdk = CustomAuth(authArgs)
         val verifier = web3AuthResponse.userInfo?.verifier
         val verifierId = web3AuthResponse.userInfo?.verifierId
 
         Executors.newSingleThreadExecutor().execute {
-            web3Address = torusSdk.getEthAddress(verifier, verifierId)
+            publicAddress = torusSdk.getEthAddress(verifier, verifierId)
             runOnUiThread {
-                findViewById<AppCompatTextView>(R.id.tvAddress).text = web3Address.take(3).plus("...").plus(web3Address.takeLast(4))
-                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ETH_Address, web3Address)
-                retrieveBalance(web3Address)
+                findViewById<AppCompatTextView>(R.id.tvAddress).text =
+                    publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
+                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ETH_Address, publicAddress)
+                retrieveBalance(publicAddress)
+                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
+            }
+        }
+    }
+
+    private fun getCurrencyPriceInUSD(fsym: String, tsyms: String) {
+        GlobalScope.launch {
+            val web3AuthApi = ApiHelper.getInstance(ApiHelper.baseUrl).create(Web3AuthApi::class.java)
+            val result = web3AuthApi.getCurrencyPrice(fsym, tsyms)
+            if(result.isSuccessful && result.body() != null) {
+                Handler(Looper.getMainLooper()).postDelayed(10) {
+                    priceInUSD = result.body()?.USD.toString()
+                    tvExchangeRate.text = "1 ".plus(fsym).plus(" = ").plus(priceInUSD).plus(" $tsyms")
+                }
             }
         }
     }
 
     private fun retrieveBalance(publicAddress: String) {
-        //get wallet's balance
         Executors.newSingleThreadExecutor().execute {
             try {
                 web3Balance = web3.ethGetBalance(
@@ -164,14 +200,16 @@ class MainActivity : AppCompatActivity() {
             }
             runOnUiThread {
                 val tvBalance = findViewById<AppCompatTextView>(R.id.tvBalance)
-                tvBalance.text = web3Balance.balance.toString()
+                tvBalance.text = Web3AuthUtils.toEther(web3Balance).toString()
+                val usdPrice = BigDecimal(web3Balance.balance.toDouble()).multiply(BigDecimal(priceInUSD))/Web3AuthUtils.getEtherInWei().toBigDecimal()
+                tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
             }
         }
     }
 
-    private fun signMessage(privetKey: String, recipientAddress: String, amountToBeSent: Double) {
+    private fun signMessage(privateKey: String, recipientAddress: String, amountToBeSent: Double) {
         try {
-            val credentials: Credentials = Credentials.create(privetKey)
+            val credentials: Credentials = Credentials.create(privateKey)
             println("Account address: " + credentials.address)
             println(
                 "Balance: " + Convert.fromWei(
@@ -193,32 +231,20 @@ class MainActivity : AppCompatActivity() {
                 recipientAddress, value
             )
             // Sign the transaction
-            val signedMessage: ByteArray = TransactionEncoder.signMessage(rawTransaction, credentials)
+            val signedMessage: ByteArray =
+                TransactionEncoder.signMessage(rawTransaction, credentials)
             val hexValue: String = Numeric.toHexString(signedMessage)
-            val ethSendTransaction: EthSendTransaction = web3.ethSendRawTransaction(hexValue).send()
-            val transactionHash: String = ethSendTransaction.transactionHash
-            println("transactionHash: $transactionHash")
-            showSignTransactionDialog(true, transactionHash)
-        } catch (ex: Exception) { ex.printStackTrace() }
-    }
-
-    @Throws(java.lang.Exception::class)
-    fun makeTransaction(privateKey: String, recipientAddress: String, amountToBeSent: Double) {
-        try {
-            val credentials: Credentials = Credentials.create(privateKey)
-            val receipt = Transfer.sendFunds(web3,
-                credentials,
-                recipientAddress,
-                BigDecimal.valueOf(amountToBeSent),
-                Convert.Unit.ETHER
-            ).send()
-            toast("Transaction successful: " + receipt.transactionHash)
-        } catch (e: java.lang.Exception) {
-            println("low balance")
+            println("kexValue: $hexValue")
+            // val ethSendTransaction: EthSendTransaction = web3.ethSendRawTransaction(hexValue).send()
+            // val transactionHash: String = ethSendTransaction.transactionHash
+            // println("transactionHash: $transactionHash")
+            showSignTransactionDialog(true, hexValue)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 
-    private fun showQR_Dialog(publicAddress: String) {
+    private fun showQRDialog(publicAddress: String) {
         val dialog = Dialog(this@MainActivity)
         dialog.setContentView(R.layout.dialog_qr_code)
         dialog.window?.setLayout(
@@ -233,9 +259,10 @@ class MainActivity : AppCompatActivity() {
         val ivClose = dialog.findViewById<AppCompatImageView>(R.id.ivClose)
 
         tvAddress.text = publicAddress
+        tvAddress.setOnClickListener { copyToClipboard(tvAddress.text.toString()) }
 
         val writer = QRCodeWriter()
-        val bitMatrix = writer.encode(publicAddress, BarcodeFormat.QR_CODE, 400, 400)
+        val bitMatrix = writer.encode(publicAddress, BarcodeFormat.QR_CODE, 200, 200)
         val w = bitMatrix.width
         val h = bitMatrix.height
         val pixels = IntArray(w * h)
@@ -270,7 +297,7 @@ class MainActivity : AppCompatActivity() {
         val tvCopy = dialog.findViewById<AppCompatTextView>(R.id.tvCopy)
         val ivClose = dialog.findViewById<AppCompatImageView>(R.id.ivClose)
 
-        if(isSuccess) {
+        if (isSuccess) {
             transactionHash.text = ethHash
             transactionState.text = getString(R.string.sign_success)
             ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
@@ -330,33 +357,6 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun showConfirmTransactionDialog() {
-        val dialog = Dialog(this@MainActivity)
-        dialog.setContentView(R.layout.dialog_confirm_transaction)
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.attributes?.windowAnimations = R.style.animation
-        val tvNetwork = dialog.findViewById<AppCompatTextView>(R.id.tvNetwork)
-        val tvSenderAdd = dialog.findViewById<AppCompatTextView>(R.id.tvSenderAdd)
-        val tvReceiptAdd = dialog.findViewById<AppCompatTextView>(R.id.tvReceiptAdd)
-        val tvAmountValue = dialog.findViewById<AppCompatTextView>(R.id.tvAmountValue)
-        val tvExchangePrice = dialog.findViewById<AppCompatTextView>(R.id.tvExchangePrice)
-        val tvTransactionValue = dialog.findViewById<AppCompatTextView>(R.id.tvTransactionValue)
-        val tvTotalAmount = dialog.findViewById<AppCompatTextView>(R.id.tvTotalAmount)
-        val tvTotalCostInUSD = dialog.findViewById<AppCompatTextView>(R.id.tvTotalCostInUSD)
-        val tvExchangeTime = dialog.findViewById<AppCompatTextView>(R.id.tvExchangeTime)
-        val btnCancel = dialog.findViewById<AppCompatButton>(R.id.btnCancel)
-
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
     private fun copyToClipboard(text: String) {
         val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText("text", text)
@@ -364,14 +364,29 @@ class MainActivity : AppCompatActivity() {
         toast("Text Copied")
     }
 
+    private fun openCustomTabs(url: String) {
+        val defaultBrowser = this@MainActivity.getDefaultBrowser()
+        val customTabsBrowsers = this@MainActivity.getCustomTabsBrowsers()
+
+        if (customTabsBrowsers.contains(defaultBrowser)) {
+            val customTabs = CustomTabsIntent.Builder().build()
+            customTabs.intent.setPackage(defaultBrowser)
+            customTabs.launchUrl(this@MainActivity, Uri.parse(url))
+        } else if (customTabsBrowsers.isNotEmpty()) {
+            val customTabs = CustomTabsIntent.Builder().build()
+            customTabs.intent.setPackage(customTabsBrowsers[0])
+            customTabs.launchUrl(this@MainActivity, Uri.parse(url))
+        }
+    }
+
     private fun logout() {
-        val logoutCompletableFuture =  web3Auth.logout()
+        val logoutCompletableFuture = web3Auth.logout()
         logoutCompletableFuture.whenComplete { _, error ->
             if (error == null) {
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 finish()
             } else {
-                Log.d("MainActivity_Web3Auth", error.message ?: "Something went wrong" )
+                Log.d("MainActivity_Web3Auth", error.message ?: "Something went wrong")
             }
         }
     }

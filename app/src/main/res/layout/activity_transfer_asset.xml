@@ -78,12 +78,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvNetwork">
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/spBlockChain"
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etBlockChain"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_centerHorizontal="true"
-                android:entries="@array/blockchains" />
+                android:textColor="@color/text_color"
+                android:enabled="false"
+                android:padding="10dp"
+                android:layout_centerHorizontal="true" />
 
         </RelativeLayout>
 
@@ -110,7 +112,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/etBlockchainAddress"
+            android:id="@+id/etReceiptentAddress"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="@string/address"
@@ -127,13 +129,16 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_spinner"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etBlockchainAddress">
+            app:layout_constraintTop_toBottomOf="@+id/etReceiptentAddress">
 
-            <androidx.appcompat.widget.AppCompatSpinner
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etBlockChainAdd"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_centerHorizontal="true"
-                android:entries="@array/networkAddress" />
+                android:padding="10dp"
+                android:textColor="@color/text_color"
+                android:enabled="false"
+                android:layout_centerHorizontal="true" />
 
         </RelativeLayout>
 
@@ -167,6 +172,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tvSendAll">
 
             <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etAmountToSend"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:hint="0.00"
@@ -227,6 +233,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tvTransactionFee">
 
             <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etMaxTransFee"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:hint="Upto 0.00041157"
@@ -282,7 +289,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnTransfer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"

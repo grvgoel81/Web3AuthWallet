@@ -190,7 +190,7 @@
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvExchangePrice"
+                android:id="@+id/tvPriceInUSD"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"

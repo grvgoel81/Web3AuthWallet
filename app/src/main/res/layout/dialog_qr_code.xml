@@ -51,12 +51,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tvPublicAddress"
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="12sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:gravity="center"
         android:textColor="@color/black"
-        android:drawableRight="@drawable/ic_qr_code"
+        android:drawableRight="@drawable/ic_copy"
         android:drawablePadding="5dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="Qxkjkmhfnpljvg"/>
+        android:text="0x9Ea7a8618ec96986f4D09bb339c150d7Abd64c11"/>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivQRCode"
@@ -64,7 +67,6 @@
         android:layout_height="250dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

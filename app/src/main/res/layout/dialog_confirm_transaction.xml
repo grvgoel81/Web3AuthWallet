@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
+    android:paddingBottom="40dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg_rounded_dialog">
 
@@ -18,9 +19,10 @@
         android:layout_marginTop="25dp"
         android:textColor="@color/black"
         android:textStyle="bold"
+        android:textSize="18sp"
         android:text="@string/confirm_transaction"/>
 
-    <androidx.appcompat.widget.AppCompatCheckedTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvSenderAdd"
         android:layout_width="58dp"
         android:layout_height="wrap_content"
@@ -41,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatCheckedTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvReceiptAdd"
         android:layout_width="58dp"
         android:layout_height="wrap_content"
@@ -72,7 +74,7 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/grey"
+        android:background="@color/line_bg_color"
         android:layout_marginTop="50dp"
         app:layout_constraintTop_toBottomOf="@+id/tvNetwork"/>
 
@@ -146,7 +148,7 @@
         android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/grey"
+        android:background="@color/line_bg_color"
         android:layout_marginTop="40dp"
         app:layout_constraintTop_toBottomOf="@+id/tvExchangeTime"/>
 
@@ -191,6 +193,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/confirm"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginTop="62dp"
         android:textAllCaps="false"
         android:textColor="@color/white"
@@ -198,17 +202,18 @@
         android:foreground="?android:attr/selectableItemBackground"
         app:layout_constraintTop_toBottomOf="@+id/tvTotalCostInUSD"/>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnCancel"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCancel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/cancel"
         android:layout_marginTop="22dp"
         android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:background="@drawable/bg_button"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
         android:foreground="?android:attr/selectableItemBackground"
         app:layout_constraintTop_toBottomOf="@+id/btnConfirm"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

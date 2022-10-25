@@ -48,6 +48,17 @@ dependencies {
     implementation 'org.torusresearch:torus-utils-java:2.0.1'
     implementation 'org.torusresearch:fetch-node-details-java:3.0.0'
 
+    // retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+
+    // Gson
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    // coroutine
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
+
     // Encoding
     implementation 'com.google.code.gson:gson:2.9.0'
 
@@ -62,6 +73,9 @@ dependencies {
     implementation('com.paymennt:solanaj:0.0.7'){
         exclude group: 'org.bouncycastle'
     }
+
+    //custom browser
+    implementation 'androidx.browser:browser:1.4.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

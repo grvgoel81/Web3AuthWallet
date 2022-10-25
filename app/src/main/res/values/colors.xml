@@ -10,4 +10,6 @@
     <color name="grey">#595857</color>
     <color name="activity_bg_color">#E5E5E5</color>
     <color name="line_separator_color">#D3D3D4</color>
+    <color name="line_bg_color">#C4C4C4</color>
+    <color name="text_color">#6F717A</color>
 </resources>
