@@ -70,12 +70,18 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     //solana
-    implementation('com.paymennt:solanaj:0.0.7'){
+    implementation('com.paymennt:solanaj:0.0.7') {
         exclude group: 'org.bouncycastle'
     }
 
+    // android security
+    implementation 'androidx.security:security-crypto:1.0.0-alpha02'
+
     //custom browser
     implementation 'androidx.browser:browser:1.4.0'
+
+    //lottie animation
+    implementation "com.airbnb.android:lottie:3.4.0"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

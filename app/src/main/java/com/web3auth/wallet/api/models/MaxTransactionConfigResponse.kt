@@ -1,9 +1,15 @@
 package com.web3auth.wallet.api.models
 
-data class MaxTransactionConfigResponse(
-    val low: Params? = null,
-    val medium: Params? = null,
-    val high: Params? = null
+data class EthGasAPIResponse(
+    val fast: Double,
+    val fastest: Double,
+    val safeLow: Double,
+    val average: Double,
+    val speed: Double,
+    val safeLowWait: Double,
+    val avgWait: Double,
+    val fastestWait: Double,
+    val fastWait: Double
 )
 
 data class Params(

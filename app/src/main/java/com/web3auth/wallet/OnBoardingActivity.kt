@@ -2,7 +2,6 @@ package com.web3auth.wallet
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -26,6 +25,7 @@ class OnBoardingActivity: AppCompatActivity() {
     private var expandFlag = false
     private lateinit var web3Auth: Web3Auth
     private lateinit var selectedNetwork: String
+    private lateinit var ivFullLogin: AppCompatImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +38,12 @@ class OnBoardingActivity: AppCompatActivity() {
 
     private fun setUpListeners() {
         val rlSocialLogins = findViewById<RelativeLayout>(R.id.rlSocialLogins)
-        findViewById<AppCompatImageView>(R.id.ivFullLogin).setOnClickListener {
-            expandFlag = if(expandFlag) {
+        ivFullLogin = findViewById(R.id.ivFullLogin)
+        ivFullLogin.setOnClickListener {
+            expandFlag = if (expandFlag) {
                 collapse(rlSocialLogins)
                 false
-            }  else {
+            } else {
                 expand(rlSocialLogins)
                 true
             }
@@ -64,7 +65,7 @@ class OnBoardingActivity: AppCompatActivity() {
     }
 
     private fun configureWeb3Auth() {
-        selectedNetwork = Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "").toString()
+        selectedNetwork = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "").toString()
         web3Auth = Web3Auth(
             Web3AuthOptions(context = this,
                 clientId = getString(R.string.web3auth_project_id),
@@ -99,9 +100,10 @@ class OnBoardingActivity: AppCompatActivity() {
         )
         loginCompletableFuture.whenComplete { loginResponse, error ->
             if (error == null) {
-                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(LOGIN_RESPONSE, loginResponse)
+                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(LOGIN_RESPONSE, loginResponse)
+                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(SESSION_ID, loginResponse.sessionId.toString())
                 startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
-                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ISONBOARDED, true)
+                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(ISONBOARDED, true)
             } else {
                 Log.d("OnBoardingError", error.message ?: "Something went wrong" )
             }
@@ -138,6 +140,7 @@ class OnBoardingActivity: AppCompatActivity() {
 
         a.duration = (targetHeight / v.context.resources.displayMetrics.density).toInt().toLong()
         v.startAnimation(a)
+        ivFullLogin.setImageDrawable(getDrawable(R.drawable.ic_collapse_arrow))
     }
 
     private fun collapse(v: View) {
@@ -158,5 +161,6 @@ class OnBoardingActivity: AppCompatActivity() {
         }
         a.duration = (initialHeight / v.context.resources.displayMetrics.density).toInt().toLong()
         v.startAnimation(a)
+        ivFullLogin.setImageDrawable(getDrawable(R.drawable.ic_expand_arrow))
     }
 }

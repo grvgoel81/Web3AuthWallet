@@ -23,7 +23,7 @@ class LoginActivity: AppCompatActivity() {
         setUpSpinner()
         findViewById<AppCompatButton>(R.id.btnLogin).setOnClickListener {
             startActivity(Intent(this@LoginActivity, OnBoardingActivity::class.java))
-            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ISLOGGEDIN, true)
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(ISLOGGEDIN, true)
             finish()
         }
     }
@@ -37,15 +37,15 @@ class LoginActivity: AppCompatActivity() {
             ArrayAdapter(this, R.layout.item_dropdown, networks)
         networkSpinner.setAdapter(networkAdapter)
         networkSpinner.setOnItemClickListener { _, _, position, _ ->
-            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(NETWORK, networks[position])
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(NETWORK, networks[position])
         }
 
         blockChainSpinner = findViewById(R.id.spBlockChain)
         val adapter: ArrayAdapter<String> =
             ArrayAdapter(this, R.layout.item_dropdown, blockchains)
         blockChainSpinner.setAdapter(adapter)
-        blockChainSpinner.setOnItemClickListener { _, view, position, id ->
-            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(BLOCKCHAIN, blockchains[position])
+        blockChainSpinner.setOnItemClickListener { _, _, position, _ ->
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(BLOCKCHAIN, blockchains[position])
         }
     }
 }

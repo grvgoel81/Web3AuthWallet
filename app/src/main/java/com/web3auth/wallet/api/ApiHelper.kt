@@ -9,8 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiHelper {
 
-    const val baseUrl = "https://api.tor.us"
-    const val herokuBaseUrl = "https://mock-gas-server.herokuapp.com/"
+    private const val baseUrl = "https://api.tor.us"
+    private const val ethUrl = "https://ethgasstation.info"
 
     private val okHttpClient = OkHttpClient().newBuilder()
         .addInterceptor(HttpLoggingInterceptor().apply {
@@ -22,8 +22,15 @@ object ApiHelper {
 
     private val builder = GsonBuilder().disableHtmlEscaping().create()
 
-    fun getInstance(baseURL: String): Retrofit {
-        return Retrofit.Builder().baseUrl(baseURL)
+    fun getTorusInstance(): Retrofit {
+        return Retrofit.Builder().baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create(builder))
+            .client(okHttpClient)
+            .build()
+    }
+
+    fun getEthInstance(): Retrofit {
+        return Retrofit.Builder().baseUrl(ethUrl)
             .addConverterFactory(GsonConverterFactory.create(builder))
             .client(okHttpClient)
             .build()

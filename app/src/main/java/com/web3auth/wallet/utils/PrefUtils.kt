@@ -1,17 +1,23 @@
 package com.web3auth.wallet.utils
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
-import android.widget.Toast
-import com.google.gson.Gson
 import android.view.View
+import android.widget.Toast
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
+import com.google.gson.Gson
 
+private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 val Context.web3AuthWalletPreferences: SharedPreferences
-    get() = getSharedPreferences(
-        "${this.packageName}_${this.javaClass.simpleName}",
-        MODE_PRIVATE
+    get() = EncryptedSharedPreferences.create(
+        "Web3Auth",
+        masterKeyAlias,
+        this,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
+
 
 inline fun <reified T : Any> SharedPreferences.getObject(key: String): T? {
     return Gson().fromJson<T>(getString(key, null), T::class.java)
@@ -80,6 +86,9 @@ const val ETH_Address = "ethAddress"
 const val NETWORK = "network"
 const val BLOCKCHAIN = "blockchain"
 const val LOGIN_RESPONSE= "login-response"
+const val SESSION_ID = "sessionId"
 const val ISLOGGEDIN = "isLoggedIn"
 const val ISONBOARDED = "isOnboarded"
 const val PUBLICKEY = "publicKey"
+const val PRICE_IN_USD = "priceInUSD"
+

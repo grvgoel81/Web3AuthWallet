@@ -257,7 +257,7 @@
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/etEnterMessage"
+                android:id="@+id/etMessage"
                 android:layout_width="match_parent"
                 android:layout_height="210dp"
                 android:layout_below="@+id/tvMessage"
@@ -273,7 +273,7 @@
                 android:id="@+id/btnSign"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/etEnterMessage"
+                android:layout_below="@+id/etMessage"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_button"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -284,9 +284,6 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
         </RelativeLayout>
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

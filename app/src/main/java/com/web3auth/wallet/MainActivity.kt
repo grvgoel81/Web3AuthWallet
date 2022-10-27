@@ -1,6 +1,7 @@
 package com.web3auth.wallet
 
 import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,14 +13,18 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.os.postDelayed
+import androidx.core.widget.addTextChangedListener
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import com.web3auth.core.Web3Auth
@@ -33,20 +38,19 @@ import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.web3j.crypto.Credentials
-import org.web3j.crypto.RawTransaction
-import org.web3j.crypto.TransactionEncoder
+import org.web3j.crypto.*
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.response.EthGetBalance
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount
+import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
 import org.web3j.utils.Convert
 import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.text.DecimalFormat
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -54,25 +58,35 @@ class MainActivity : AppCompatActivity() {
     private lateinit var web3Auth: Web3Auth
     private var web3AuthResponse: Web3AuthResponse? = null
     private lateinit var web3: Web3j
-    private lateinit var credentials: Credentials
     private lateinit var publicAddress: String
     private lateinit var web3Balance: EthGetBalance
     private lateinit var selectedNetwork: String
     private lateinit var tvExchangeRate: AppCompatTextView
     private lateinit var tvPriceInUSD: AppCompatTextView
     private lateinit var priceInUSD: String
+    private lateinit var etMessage: AppCompatEditText
+    private lateinit var btnSign: AppCompatButton
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
         selectedNetwork =
-            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
                 .toString()
+        showProgressDialog()
         configureWeb3j()
         configureWeb3Auth()
         setData()
         setUpListeners()
+    }
+
+    private fun showProgressDialog() {
+        progressDialog = ProgressDialog(this@MainActivity)
+        progressDialog.setMessage(getString(R.string.loading_balance))
+        progressDialog.setCancelable(false)
+        progressDialog.show()
     }
 
     private fun configureWeb3Auth() {
@@ -93,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         web3Auth.setResultUrl(intent.data)
         web3AuthResponse =
-            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
         web3AuthResponse?.let { getEthAddress(it) }
 
         findViewById<AppCompatTextView>(R.id.tvName).text = "Welcome ".plus(
@@ -118,7 +132,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpListeners() {
         tvExchangeRate = findViewById(R.id.tvExchangeRate)
+        etMessage = findViewById(R.id.etMessage)
         tvPriceInUSD = findViewById(R.id.tvPriceInUSD)
+        btnSign = findViewById(R.id.btnSign)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
             startActivity(Intent(this@MainActivity, TransferAssetsActivity::class.java))
         }
@@ -128,15 +144,23 @@ class MainActivity : AppCompatActivity() {
             showQRDialog(publicAddress)
         }
 
-        findViewById<AppCompatButton>(R.id.btnSign).setOnClickListener {
-            //signMessage()
-            showSignTransactionDialog(false, "")
+        btnSign.setOnClickListener {
+            if(etMessage.text.toString().isNullOrEmpty() || Web3AuthUtils.containsEmoji(etMessage.text.toString())) {
+                toast("Invalid message")
+                return@setOnClickListener
+            }
+            var signatureHash = getSignature(web3AuthResponse?.sessionId.toString(), etMessage.text.toString())
+            if(signatureHash.isNullOrEmpty()) {
+                showSignTransactionDialog(false)
+            } else {
+                showSignTransactionDialog(true, signatureHash)
+            }
         }
     }
 
     private fun setData() {
         val blockChain =
-            Web3AuthApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
         findViewById<AppCompatTextView>(R.id.tvNetwork).text =
             blockChain.plus(" ").plus(selectedNetwork)
 
@@ -167,20 +191,21 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 findViewById<AppCompatTextView>(R.id.tvAddress).text =
                     publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(ETH_Address, publicAddress)
+                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(ETH_Address, publicAddress)
                 retrieveBalance(publicAddress)
-                Web3AuthApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
+                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
             }
         }
     }
 
     private fun getCurrencyPriceInUSD(fsym: String, tsyms: String) {
         GlobalScope.launch {
-            val web3AuthApi = ApiHelper.getInstance(ApiHelper.baseUrl).create(Web3AuthApi::class.java)
+            val web3AuthApi = ApiHelper.getTorusInstance().create(Web3AuthApi::class.java)
             val result = web3AuthApi.getCurrencyPrice(fsym, tsyms)
             if(result.isSuccessful && result.body() != null) {
                 Handler(Looper.getMainLooper()).postDelayed(10) {
                     priceInUSD = result.body()?.USD.toString()
+                    Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PRICE_IN_USD, priceInUSD)
                     tvExchangeRate.text = "1 ".plus(fsym).plus(" = ").plus(priceInUSD).plus(" $tsyms")
                 }
             }
@@ -199,49 +224,24 @@ class MainActivity : AppCompatActivity() {
                 toast("balance failed")
             }
             runOnUiThread {
+                println("web3Balance: ${web3Balance.balance}" )
                 val tvBalance = findViewById<AppCompatTextView>(R.id.tvBalance)
-                tvBalance.text = Web3AuthUtils.toEther(web3Balance).toString()
-                val usdPrice = BigDecimal(web3Balance.balance.toDouble()).multiply(BigDecimal(priceInUSD))/Web3AuthUtils.getEtherInWei().toBigDecimal()
+                tvBalance.text = Web3AuthUtils.toWeiEther(web3Balance).toString()
+                var usdPrice = Web3AuthUtils.getPriceInUSD(web3Balance.balance.toDouble(), priceInUSD)
                 tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
+                progressDialog.hide()
             }
         }
     }
 
-    private fun signMessage(privateKey: String, recipientAddress: String, amountToBeSent: Double) {
-        try {
-            val credentials: Credentials = Credentials.create(privateKey)
-            println("Account address: " + credentials.address)
-            println(
-                "Balance: " + Convert.fromWei(
-                    web3.ethGetBalance(credentials.address, DefaultBlockParameterName.LATEST)
-                        .send().balance.toString(), Convert.Unit.ETHER
-                )
-            )
-            val ethGetTransactionCount: EthGetTransactionCount = web3
-                .ethGetTransactionCount(credentials.address, DefaultBlockParameterName.LATEST)
-                .send()
-            val nonce: BigInteger = ethGetTransactionCount.transactionCount
-            val value: BigInteger =
-                Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
-            val gasLimit: BigInteger = BigInteger.valueOf(21000)
-            val gasPrice: BigInteger = Convert.toWei("1", Convert.Unit.GWEI).toBigInteger()
-
-            val rawTransaction: RawTransaction = RawTransaction.createEtherTransaction(
-                nonce, gasPrice, gasLimit,
-                recipientAddress, value
-            )
-            // Sign the transaction
-            val signedMessage: ByteArray =
-                TransactionEncoder.signMessage(rawTransaction, credentials)
-            val hexValue: String = Numeric.toHexString(signedMessage)
-            println("kexValue: $hexValue")
-            // val ethSendTransaction: EthSendTransaction = web3.ethSendRawTransaction(hexValue).send()
-            // val transactionHash: String = ethSendTransaction.transactionHash
-            // println("transactionHash: $transactionHash")
-            showSignTransactionDialog(true, hexValue)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
+    private fun getSignature(privateKey: String, message: String): String {
+        val credentials: Credentials = Credentials.create(privateKey)
+        val hashedData = Hash.sha3(message.toByteArray(StandardCharsets.UTF_8))
+        val signature = Sign.signMessage(hashedData, credentials.ecKeyPair)
+        val r = Numeric.toHexString(signature.r)
+        val s = Numeric.toHexString(signature.s).substring(2)
+        val v = Numeric.toHexString(signature.v).substring(2)
+        return StringBuilder(r).append(s).append(v).toString()
     }
 
     private fun showQRDialog(publicAddress: String) {
@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun showSignTransactionDialog(isSuccess: Boolean, ethHash: String?) {
+    private fun showSignTransactionDialog(isSuccess: Boolean, ethHash: String? = null) {
         val dialog = Dialog(this@MainActivity)
         dialog.setContentView(R.layout.popup_sign_transaction)
         dialog.window?.setLayout(
