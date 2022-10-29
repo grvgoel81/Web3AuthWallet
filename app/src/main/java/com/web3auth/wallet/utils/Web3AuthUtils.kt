@@ -27,7 +27,7 @@ object Web3AuthUtils {
 
     fun getEtherInWei() = 10.0.pow(18)
 
-    private fun getEtherInGwei() = 10.0.pow(9)
+    private fun getEtherInGwei() = 10.0.pow(10)
 
     fun toWeiEther(ethBalance: EthGetBalance): Double {
         var decimalWei = ethBalance.balance.toDouble()
@@ -46,7 +46,7 @@ object Web3AuthUtils {
 
     fun isValidEthAddress(address: String): Boolean {
         val ethAddressRegex = Regex(pattern = "^0x[a-fA-F0-9]{40}$")
-        return ethAddressRegex.containsMatchIn(input = address)
+        return ethAddressRegex.matches(input = address)
     }
 
     fun convertMinsToSec(mins: Double): Double = mins * 60L
@@ -72,5 +72,5 @@ object Web3AuthUtils {
     fun getPriceInUSD(balance: Double, priceInUSD:String): BigDecimal =
         BigDecimal(balance).multiply(BigDecimal(priceInUSD))/getEtherInWei().toBigDecimal()
 
-    fun getPriceinUSD(balance: Double, usdPrice: Double): Double = balance.div(usdPrice)
+    fun getPriceinUSD(ethAmount: Double, usdPrice: Double): Double = ethAmount * (usdPrice)
 }

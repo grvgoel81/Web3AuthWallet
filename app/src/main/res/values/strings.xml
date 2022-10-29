@@ -50,6 +50,9 @@
     <string name="save">Save</string>
     <string name="usd">USD</string>
     <string name="loading_balance">Loading balance</string>
+    <string name="enter_amt_to_transfer">Enter amount to transfer</string>
+    <string name="enter_address">Enter Address</string>
+    <string name="correct_address">Enter correct address</string>
     <string name="web3auth_project_id">BASdZxp5tWqPGkzbOU4VMJsnz8QOpJ2pyxf6kZcuxI8AJ1gsOw5MgbW96RpAAx_Kk-5p4rhOopPhCa9kR_9mKpE</string>
     <string name="ethereum">Ethereum</string>
     <string name="solana">Solana</string>

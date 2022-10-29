@@ -276,6 +276,7 @@
             android:layout_marginTop="4dp"
             android:text="0.000096 ETH"
             android:textColor="@color/grey"
+            android:maxLength="13"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"

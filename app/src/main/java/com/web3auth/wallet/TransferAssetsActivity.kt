@@ -52,11 +52,16 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var publicAddress: String
     private lateinit var ethGasAPIResponse: EthGasAPIResponse
     private lateinit var blockChain: String
+    private lateinit var network: String
     private lateinit var tvEth: AppCompatTextView
     private lateinit var tvUSD: AppCompatTextView
+    private lateinit var tvTotalAmount: AppCompatTextView
+    private lateinit var tvCostInETH: AppCompatTextView
     private lateinit var sessionID: String
     private lateinit var priceInUSD: String
     private var totalCostinETH: Double = 0.0
+    private var gasFee: Double = 0.0
+    private var processTime:Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,11 +79,12 @@ class TransferAssetsActivity : AppCompatActivity() {
         etMaxTransFee = findViewById(R.id.etMaxTransFee)
         tvEth = findViewById(R.id.tvEth)
         tvUSD = findViewById(R.id.tvUSD)
+        tvTotalAmount = findViewById(R.id.tvTotalAmount)
+        tvCostInETH = findViewById(R.id.tvCostInETH)
         val etBlockChain = findViewById<AppCompatEditText>(R.id.etBlockChain)
         val etBlockChainAdd = findViewById<AppCompatEditText>(R.id.etBlockChainAdd)
-        val tvTotalAmount = findViewById<AppCompatTextView>(R.id.tvTotalAmount)
-        val tvCostInETH = findViewById<AppCompatTextView>(R.id.tvCostInETH)
         blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum").toString()
+        network = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
         publicAddress = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PUBLICKEY, "").toString()
         sessionID = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(SESSION_ID, "").toString()
         priceInUSD = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PRICE_IN_USD, "").toString()
@@ -101,10 +107,11 @@ class TransferAssetsActivity : AppCompatActivity() {
 
         etAmountToSend.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                totalCostinETH =  s.toString().toDouble().plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
-                tvTotalAmount.text = totalCostinETH.toString().plus(" " + Web3AuthUtils.getCurrency(blockChain))
-                tvCostInETH.text = "= ".plus(Web3AuthUtils.getPriceinUSD(totalCostinETH, priceInUSD.toDouble()).toString().substring(0,10))
-                    .plus(" ").plus(getString(R.string.usd))
+                if(s?.isNotEmpty() == true) {
+                    totalCostinETH = s.toString().toDouble()
+                        .plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
+                    setTotalAmount()
+                }
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -113,12 +120,14 @@ class TransferAssetsActivity : AppCompatActivity() {
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
             //signMessage(Web3AuthUtils.getPrivateKey(sessionID), "0xE84D601E5D945031129a83E5602be0CC7f182Cf3"/*etReceiptentAddress.text.toString()*/, 0.00012)
             if (isValidDetails()) {
-                /*showConfirmTransactionDialog(
+                showConfirmTransactionDialog(
                     publicAddress,
                     etReceiptentAddress.text.toString(),
-                    etAmountToSend.text.toString().toDouble(),
-                    etMaxTransFee.text.toString().toDouble(),
-                )*/
+                    etAmountToSend.text.toString(),
+                    gasFee, processTime,
+                    tvTotalAmount.text.toString(),
+                    tvCostInETH.text.toString()
+                )
             }
         }
 
@@ -173,16 +182,22 @@ class TransferAssetsActivity : AppCompatActivity() {
                 Handler(Looper.getMainLooper()).postDelayed(10) {
                     ethGasAPIResponse = result.body()!!
                     setMaxTransFee(ethGasAPIResponse.fastest)
+                    gasFee = ethGasAPIResponse.fastest
+                    processTime = ethGasAPIResponse.fastestWait
                 }
             }
         }
     }
 
     private fun isValidDetails(): Boolean {
-        return if (Web3AuthUtils.isValidEthAddress(etReceiptentAddress.text.toString()) && etReceiptentAddress.text?.isNullOrEmpty() == true) {
-            toast("Enter correct address")
+        return if(etReceiptentAddress.text?.isNullOrEmpty() == true) {
+            toast(getString(R.string.enter_address))
             false
-        } else if(etAmountToSend.text?.isNullOrEmpty() == true) {
+        } /*else if (Web3AuthUtils.isValidEthAddress(etReceiptentAddress.text.toString())) {
+            toast(getString(R.string.correct_address))
+            false
+        } */else if(etAmountToSend.text?.isNullOrEmpty() == true) {
+            toast(getString(R.string.enter_amt_to_transfer))
             false
         } else {
             true
@@ -251,27 +266,30 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvSlowEth.text = getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.average))
             .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
 
-        rbFast.setOnClickListener {
+        clFast.setOnClickListener {
             rbAvg.isChecked = false
             rbSlow.isChecked = false
-            clFast.performClick()
             dialog.dismiss()
+            gasFee = ethGasAPIResponse.fastest
+            processTime = ethGasAPIResponse.fastestWait
             setMaxTransFee(ethGasAPIResponse.fastest)
         }
 
-        rbAvg.setOnClickListener {
+        clAvg.setOnClickListener {
             rbFast.isChecked = false
             rbSlow.isChecked = false
-            clAvg.performClick()
             dialog.dismiss()
+            gasFee = ethGasAPIResponse.fast
+            processTime = ethGasAPIResponse.fastWait
             setMaxTransFee(ethGasAPIResponse.fast)
         }
 
-        rbSlow.setOnClickListener {
+        clSlow.setOnClickListener {
             rbAvg.isChecked = false
             rbFast.isChecked = false
-            clSlow.performClick()
             dialog.dismiss()
+            gasFee = ethGasAPIResponse.average
+            processTime = ethGasAPIResponse.avgWait
             setMaxTransFee(ethGasAPIResponse.average)
         }
 
@@ -284,66 +302,77 @@ class TransferAssetsActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun showConfirmTransactionDialog(senderAdd: String, receiptAdd: String, amountToBeSent: Double,
-        maxTransactionFee: Double, processTime: Double
+    private fun showConfirmTransactionDialog(senderAdd: String, receiptAdd: String, amountToBeSent: String,
+        gasFee: Double, processTime: Double, totalAmountInEth: String, totalAmountInUSD: String
     ) {
-        val dialog = Dialog(this@TransferAssetsActivity)
-        dialog.setContentView(R.layout.dialog_confirm_transaction)
-        dialog.window?.setLayout(
+        val transDialog = Dialog(this@TransferAssetsActivity)
+        transDialog.setContentView(R.layout.dialog_confirm_transaction)
+        transDialog.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.attributes?.windowAnimations = R.style.animation
-        val tvNetwork = dialog.findViewById<AppCompatTextView>(R.id.tvNetwork)
-        val tvSenderAdd = dialog.findViewById<AppCompatTextView>(R.id.tvSenderAdd)
-        val tvReceiptAdd = dialog.findViewById<AppCompatTextView>(R.id.tvReceiptAdd)
-        val tvAmountValue = dialog.findViewById<AppCompatTextView>(R.id.tvAmountValue)
-        val tvAmountSendInUsd = dialog.findViewById<AppCompatTextView>(R.id.tvAmountSendInUsd)
-        val tvTransactionValue = dialog.findViewById<AppCompatTextView>(R.id.tvTransactionValue)
-        val tvTotalAmountInETH = dialog.findViewById<AppCompatTextView>(R.id.tvTotalAmountInETH)
-        val tvTotalCostInUSD = dialog.findViewById<AppCompatTextView>(R.id.tvTotalCostInUSD)
-        val tvProcessTime = dialog.findViewById<AppCompatTextView>(R.id.tvProcessTime)
-        val tvCancel = dialog.findViewById<AppCompatTextView>(R.id.tvCancel)
-        val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btnConfirm)
+        transDialog.setCancelable(false)
+        transDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        transDialog.window?.attributes?.windowAnimations = R.style.animation
+        val clTransaction = transDialog.findViewById<ConstraintLayout>(R.id.clTransaction)
+        val clProgressBar = transDialog.findViewById<ConstraintLayout>(R.id.clProgressBar)
+        val tvNetwork = transDialog.findViewById<AppCompatTextView>(R.id.tvNetwork)
+        val tvSenderAdd = transDialog.findViewById<AppCompatTextView>(R.id.tvSenderAdd)
+        val tvReceiptAdd = transDialog.findViewById<AppCompatTextView>(R.id.tvReceiptAdd)
+        val tvAmountInETH = transDialog.findViewById<AppCompatTextView>(R.id.tvAmountinETH)
+        val tvAmountInUsd = transDialog.findViewById<AppCompatTextView>(R.id.tvAmountInUsd)
+        val tvTransactionValue = transDialog.findViewById<AppCompatTextView>(R.id.tvTransactionValue)
+        val tvTotalAmountInETH = transDialog.findViewById<AppCompatTextView>(R.id.tvTotalAmountInETH)
+        val tvTotalCostInUSD = transDialog.findViewById<AppCompatTextView>(R.id.tvTotalCostInUSD)
+        val tvProcessTime = transDialog.findViewById<AppCompatTextView>(R.id.tvProcessTime)
+        val tvCancel = transDialog.findViewById<AppCompatTextView>(R.id.tvCancel)
+        val btnConfirm = transDialog.findViewById<AppCompatButton>(R.id.btnConfirm)
 
         tvSenderAdd.text = senderAdd
         tvReceiptAdd.text = receiptAdd
-        tvAmountValue.text = amountToBeSent.toString().plus(Web3AuthUtils.getCurrency(blockChain))
-        tvTransactionValue.text = Web3AuthUtils.getMaxTransactionFee(maxTransactionFee).toString()
-            .plus(Web3AuthUtils.getCurrency(blockChain))
-        val totalCost = amountToBeSent.plus(Web3AuthUtils.getMaxTransactionFee(maxTransactionFee))
-        tvTotalAmountInETH.text = totalCost.toString().plus(Web3AuthUtils.getCurrency(blockChain))
-
-        val selectedNetwork =
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
-                .toString()
-        tvNetwork.text = blockChain.plus(" ").plus(selectedNetwork)
-
-        tvAmountSendInUsd.text = "~".plus(Web3AuthUtils.getPriceInUSD(amountToBeSent, priceInUSD).toString())
+        tvAmountInETH.text = amountToBeSent.plus(" " + Web3AuthUtils.getCurrency(blockChain))
+        tvAmountInUsd.text = "~".plus(String.format("%.6f", Web3AuthUtils.getPriceinUSD(amountToBeSent.toDouble(), priceInUSD.toDouble())))
             .plus(" ").plus(getString(R.string.usd))
-
+        tvNetwork.text = blockChain.plus(" ").plus(network)
+        tvTransactionValue.text = Web3AuthUtils.getMaxTransactionFee(gasFee).toString()
+            .plus(" " + Web3AuthUtils.getCurrency(blockChain))
         tvProcessTime.text = "in".plus(" ").plus(" ")
             .plus(Web3AuthUtils.convertMinsToSec(processTime)).plus(" ").plus(getString(R.string.seconds))
 
-        tvTotalCostInUSD.text = "~".plus(Web3AuthUtils.getPriceInUSD(totalCost, priceInUSD).toString())
-            .plus(" ").plus(getString(R.string.usd))
+        tvTotalAmountInETH.text = totalAmountInEth
+        tvTotalCostInUSD.text = totalAmountInUSD
 
         btnConfirm.setOnClickListener {
-            showTransactionDialog(TransactionStatus.PLACED)
+            clTransaction.hide()
+            clProgressBar.show()
+            signMessage(transDialog, Web3AuthUtils.getPrivateKey(sessionID), receiptAdd, totalAmountInEth.split(" ")[0].toDouble())
+            //showTransactionDialog(TransactionStatus.PLACED)
         }
         tvCancel.setOnClickListener {
-            dialog.dismiss()
+            transDialog.dismiss()
         }
-        dialog.show()
+        transDialog.show()
     }
 
     private fun setMaxTransFee(fee: Double) {
         etMaxTransFee.setText(getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(fee)))
+        totalCostinETH = if(etAmountToSend.text?.isNotEmpty() == true) {
+            etAmountToSend.text.toString().toDouble()
+                .plus(Web3AuthUtils.getMaxTransactionFee(fee))
+        } else {
+            Web3AuthUtils.getMaxTransactionFee(fee)
+        }
+        setTotalAmount()
     }
 
-    private fun signMessage(privateKey: String, recipientAddress: String, amountToBeSent: Double) {
+    private fun setTotalAmount() {
+        tvTotalAmount.text =
+            String.format("%.6f", totalCostinETH).plus(" " + Web3AuthUtils.getCurrency(blockChain))
+        tvCostInETH.text = "= ".plus(String.format("%.6f", Web3AuthUtils.getPriceinUSD(totalCostinETH, priceInUSD.toDouble())))
+            .plus(" ").plus(getString(R.string.usd))
+    }
+
+    private fun signMessage(transDialog: Dialog, privateKey: String, recipientAddress: String, amountToBeSent: Double) {
         GlobalScope.launch {
             try {
                 val credentials: Credentials = Credentials.create(privateKey)
@@ -380,10 +409,16 @@ class TransferAssetsActivity : AppCompatActivity() {
                     web3.ethSendRawTransaction(hexValue).send()
                 val transactionHash: String = ethSendTransaction.transactionHash
                 println("transactionHash: $transactionHash")
-                //showTransactionDialog(TransactionStatus.SUCCESSFUL)
+                runOnUiThread {
+                    showTransactionDialog(TransactionStatus.SUCCESSFUL)
+                    transDialog.dismiss()
+                }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                //showTransactionDialog(TransactionStatus.FAILED)
+                runOnUiThread {
+                    showTransactionDialog(TransactionStatus.FAILED)
+                    transDialog.dismiss()
+                }
             }
         }
     }
@@ -401,7 +436,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         val ivState = dialog.findViewById<AppCompatImageView>(R.id.ivState)
         val transactionState = dialog.findViewById<AppCompatTextView>(R.id.tvTransactionState)
         val tvStatus = dialog.findViewById<AppCompatTextView>(R.id.tvStatus)
-        val ivClose = dialog.findViewById<AppCompatImageView>(R.id.ivClose)
+        val icCLose = dialog.findViewById<AppCompatImageView>(R.id.icCLose)
 
         when (transactionStatus) {
             TransactionStatus.PLACED -> {
@@ -424,7 +459,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             }
         }
 
-        ivClose.setOnClickListener {
+        icCLose.setOnClickListener {
             dialog.dismiss()
         }
         dialog.show()
