@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var web3Auth: Web3Auth
     private var web3AuthResponse: Web3AuthResponse? = null
     private lateinit var web3: Web3j
+    private lateinit var blockChain: String
     private lateinit var publicAddress: String
     private lateinit var web3Balance: EthGetBalance
     private lateinit var selectedNetwork: String
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var priceInUSD: String
     private lateinit var etMessage: AppCompatEditText
     private lateinit var btnSign: AppCompatButton
+    private lateinit var tvBalance: AppCompatTextView
     private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +78,11 @@ class MainActivity : AppCompatActivity() {
             Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
                 .toString()
         showProgressDialog()
+        if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
+            progressDialog.hide()
+            longToast(getString(R.string.connect_to_internet))
+            return
+        }
         configureWeb3j()
         configureWeb3Auth()
         setData()
@@ -135,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         etMessage = findViewById(R.id.etMessage)
         tvPriceInUSD = findViewById(R.id.tvPriceInUSD)
         btnSign = findViewById(R.id.btnSign)
+        tvBalance = findViewById(R.id.tvBalance)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
             startActivity(Intent(this@MainActivity, TransferAssetsActivity::class.java))
         }
@@ -159,22 +167,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setData() {
-        val blockChain =
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
+        blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
+                .toString()
         findViewById<AppCompatTextView>(R.id.tvNetwork).text =
             blockChain.plus(" ").plus(selectedNetwork)
 
         findViewById<AppCompatTextView>(R.id.tvViewTransactionStatus).setOnClickListener {
-            openCustomTabs("https://mumbai.polygonscan.com/")
+            Web3AuthUtils.openCustomTabs(this@MainActivity,"https://mumbai.polygonscan.com/")
         }
 
-        getCurrencyPriceInUSD("ETH", "USD")
+        getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
 
-        /*if(blockChain == getString(R.string.ethereum)) {
-            EthManager.configureWeb3j()
-        } else {
+        if(blockChain == getString(R.string.solana)) {
             SolanaManager.createWallet(NetworkUtils.getSolanaNetwork(selectedNetwork))
-        }*/
+        }
     }
 
     private fun getEthAddress(web3AuthResponse: Web3AuthResponse) {
@@ -191,9 +197,12 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 findViewById<AppCompatTextView>(R.id.tvAddress).text =
                     publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(ETH_Address, publicAddress)
-                retrieveBalance(publicAddress)
                 Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
+                if(blockChain == getString(R.string.solana)) {
+                    getSolanaBalance(publicAddress)
+                } else {
+                    retrieveBalance(publicAddress)
+                }
             }
         }
     }
@@ -225,13 +234,19 @@ class MainActivity : AppCompatActivity() {
             }
             runOnUiThread {
                 println("web3Balance: ${web3Balance.balance}" )
-                val tvBalance = findViewById<AppCompatTextView>(R.id.tvBalance)
                 tvBalance.text = Web3AuthUtils.toWeiEther(web3Balance).toString()
                 var usdPrice = Web3AuthUtils.getPriceInUSD(web3Balance.balance.toDouble(), priceInUSD)
                 tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
                 progressDialog.hide()
             }
         }
+    }
+
+    private fun getSolanaBalance(publicAddress: String) {
+        tvBalance.text = SolanaManager.getBalance(publicAddress).toString()
+        var usdPrice = Web3AuthUtils.getPriceInUSD(SolanaManager.getBalance(publicAddress).toDouble(), priceInUSD)
+        tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
+        progressDialog.hide()
     }
 
     private fun getSignature(privateKey: String, message: String): String {
@@ -315,68 +330,11 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun showTransactionDialog(transactionStatus: TransactionStatus) {
-        val dialog = Dialog(this@MainActivity)
-        dialog.setContentView(R.layout.popup_transaction)
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.attributes?.windowAnimations = R.style.animation
-        val ivState = dialog.findViewById<AppCompatImageView>(R.id.ivState)
-        val transactionState = dialog.findViewById<AppCompatTextView>(R.id.tvTransactionState)
-        val tvStatus = dialog.findViewById<AppCompatTextView>(R.id.tvStatus)
-        val ivClose = dialog.findViewById<AppCompatImageView>(R.id.ivClose)
-
-        when (transactionStatus) {
-            TransactionStatus.PLACED -> {
-                transactionState.text = getString(R.string.transaction_placed)
-                ivState.setImageDrawable(getDrawable(R.drawable.ic_transaction_placed))
-                tvStatus.hide()
-            }
-            TransactionStatus.SUCCESSFUL -> {
-                transactionState.text = getString(R.string.transaction_success)
-                ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
-            }
-            TransactionStatus.FAILED -> {
-                transactionState.text = getString(R.string.transaction_failed)
-                ivState.setImageDrawable(getDrawable(R.drawable.ic_transaction_failed))
-                tvStatus.text = getString(R.string.try_again)
-            }
-            else -> {
-                transactionState.text = getString(R.string.transaction_pending)
-                ivState.setImageDrawable(getDrawable(R.drawable.ic_transaction_pending))
-            }
-        }
-
-        ivClose.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
     private fun copyToClipboard(text: String) {
         val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText("text", text)
         clipboardManager.setPrimaryClip(clipData)
         toast("Text Copied")
-    }
-
-    private fun openCustomTabs(url: String) {
-        val defaultBrowser = this@MainActivity.getDefaultBrowser()
-        val customTabsBrowsers = this@MainActivity.getCustomTabsBrowsers()
-
-        if (customTabsBrowsers.contains(defaultBrowser)) {
-            val customTabs = CustomTabsIntent.Builder().build()
-            customTabs.intent.setPackage(defaultBrowser)
-            customTabs.launchUrl(this@MainActivity, Uri.parse(url))
-        } else if (customTabsBrowsers.isNotEmpty()) {
-            val customTabs = CustomTabsIntent.Builder().build()
-            customTabs.intent.setPackage(customTabsBrowsers[0])
-            customTabs.launchUrl(this@MainActivity, Uri.parse(url))
-        }
     }
 
     private fun logout() {

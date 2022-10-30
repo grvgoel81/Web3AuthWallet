@@ -62,12 +62,17 @@ class TransferAssetsActivity : AppCompatActivity() {
     private var totalCostinETH: Double = 0.0
     private var gasFee: Double = 0.0
     private var processTime:Double = 0.0
+    private var isEthSelected: Boolean = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transfer_asset)
         supportActionBar?.hide()
+        if(!Web3AuthUtils.isNetworkAvailable(this@TransferAssetsActivity)) {
+            longToast(getString(R.string.connect_to_internet))
+            return
+        }
         setUpListeners()
         getMaxTransactionConfig()
         configureWeb3j()
@@ -81,16 +86,16 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvUSD = findViewById(R.id.tvUSD)
         tvTotalAmount = findViewById(R.id.tvTotalAmount)
         tvCostInETH = findViewById(R.id.tvCostInETH)
-        val etBlockChain = findViewById<AppCompatEditText>(R.id.etBlockChain)
-        val etBlockChainAdd = findViewById<AppCompatEditText>(R.id.etBlockChainAdd)
+        val etBlockChain = findViewById<AppCompatTextView>(R.id.etBlockChain)
+        val etBlockChainAdd = findViewById<AppCompatTextView>(R.id.etBlockChainAdd)
         blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum").toString()
         network = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
         publicAddress = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PUBLICKEY, "").toString()
         sessionID = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(SESSION_ID, "").toString()
         priceInUSD = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PRICE_IN_USD, "").toString()
 
-        etBlockChainAdd.setText(blockChain.let { Web3AuthUtils.getBlockChainName(it) })
-        etBlockChain.setText(blockChain)
+        etBlockChainAdd.text = blockChain.let { Web3AuthUtils.getBlockChainName(it) }
+        etBlockChain.text = blockChain
 
         findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressed() }
         findViewById<AppCompatImageView>(R.id.ivScan).setOnClickListener { scanQRCode() }
@@ -98,11 +103,18 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvEth.setOnClickListener {
             it.background = getDrawable(R.drawable.bg_layout_tv_blue)
             tvUSD.background = getDrawable(R.drawable.bg_layout_tv_grey)
+            isEthSelected = true
         }
 
         tvUSD.setOnClickListener {
             it.background = getDrawable(R.drawable.bg_layout_tv_blue)
             tvEth.background = getDrawable(R.drawable.bg_layout_tv_grey)
+            isEthSelected = false
+            if(etAmountToSend.text.toString().isNotEmpty()) {
+                val ethAmount = Web3AuthUtils.getPriceInEth(etAmountToSend.text.toString().toDouble(), priceInUSD.toDouble())
+                totalCostinETH = ethAmount.plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
+                setTotalAmount()
+            }
         }
 
         etAmountToSend.addTextChangedListener(object : TextWatcher {
@@ -193,10 +205,10 @@ class TransferAssetsActivity : AppCompatActivity() {
         return if(etReceiptentAddress.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_address))
             false
-        } /*else if (Web3AuthUtils.isValidEthAddress(etReceiptentAddress.text.toString())) {
+        } else if (!Web3AuthUtils.isValidEthAddress(etReceiptentAddress.text.toString().trim())) {
             toast(getString(R.string.correct_address))
             false
-        } */else if(etAmountToSend.text?.isNullOrEmpty() == true) {
+        } else if(etAmountToSend.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_amt_to_transfer))
             false
         } else {
@@ -266,7 +278,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvSlowEth.text = getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.average))
             .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
 
-        clFast.setOnClickListener {
+        rbFast.setOnClickListener {
             rbAvg.isChecked = false
             rbSlow.isChecked = false
             dialog.dismiss()
@@ -275,7 +287,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             setMaxTransFee(ethGasAPIResponse.fastest)
         }
 
-        clAvg.setOnClickListener {
+        rbAvg.setOnClickListener {
             rbFast.isChecked = false
             rbSlow.isChecked = false
             dialog.dismiss()
@@ -284,7 +296,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             setMaxTransFee(ethGasAPIResponse.fast)
         }
 
-        clSlow.setOnClickListener {
+        rbSlow.setOnClickListener {
             rbAvg.isChecked = false
             rbFast.isChecked = false
             dialog.dismiss()
@@ -447,11 +459,17 @@ class TransferAssetsActivity : AppCompatActivity() {
             TransactionStatus.SUCCESSFUL -> {
                 transactionState.text = getString(R.string.transaction_success)
                 ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
+                tvStatus.setOnClickListener {
+                    Web3AuthUtils.openCustomTabs(this@TransferAssetsActivity,"https://mumbai.polygonscan.com/")
+                }
             }
             TransactionStatus.FAILED -> {
                 transactionState.text = getString(R.string.transaction_failed)
                 ivState.setImageDrawable(getDrawable(R.drawable.ic_transaction_failed))
                 tvStatus.text = getString(R.string.try_again)
+                tvStatus.setOnClickListener {
+                    dialog.dismiss()
+                }
             }
             else -> {
                 transactionState.text = getString(R.string.transaction_pending)

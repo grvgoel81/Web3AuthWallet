@@ -1,5 +1,12 @@
 package com.web3auth.wallet.utils
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
+import com.web3auth.core.getCustomTabsBrowsers
+import com.web3auth.core.getDefaultBrowser
 import org.web3j.crypto.ECKeyPair
 import org.web3j.protocol.core.methods.response.EthGetBalance
 import java.math.BigDecimal
@@ -25,9 +32,28 @@ object Web3AuthUtils {
         }
     }
 
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     fun getEtherInWei() = 10.0.pow(18)
 
-    private fun getEtherInGwei() = 10.0.pow(10)
+    private fun getEtherInGwei() = 10.0.pow(9)
 
     fun toWeiEther(ethBalance: EthGetBalance): Double {
         var decimalWei = ethBalance.balance.toDouble()
@@ -73,4 +99,21 @@ object Web3AuthUtils {
         BigDecimal(balance).multiply(BigDecimal(priceInUSD))/getEtherInWei().toBigDecimal()
 
     fun getPriceinUSD(ethAmount: Double, usdPrice: Double): Double = ethAmount * (usdPrice)
+
+    fun getPriceInEth(amount: Double, usdPrice: Double) = amount/usdPrice
+
+    fun openCustomTabs(context: Context, url: String) {
+        val defaultBrowser = context.getDefaultBrowser()
+        val customTabsBrowsers = context.getCustomTabsBrowsers()
+
+        if (customTabsBrowsers.contains(defaultBrowser)) {
+            val customTabs = CustomTabsIntent.Builder().build()
+            customTabs.intent.setPackage(defaultBrowser)
+            customTabs.launchUrl(context, Uri.parse(url))
+        } else if (customTabsBrowsers.isNotEmpty()) {
+            val customTabs = CustomTabsIntent.Builder().build()
+            customTabs.intent.setPackage(customTabsBrowsers[0])
+            customTabs.launchUrl(context, Uri.parse(url))
+        }
+    }
 }
