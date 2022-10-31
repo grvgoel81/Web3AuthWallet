@@ -78,7 +78,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvNetwork">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/etBlockChain"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -112,7 +112,7 @@
             app:layout_constraintTop_toBottomOf="@+id/rlBlockchainSpinner" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/etReceiptentAddress"
+            android:id="@+id/etRecipientAddress"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
@@ -129,9 +129,9 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_spinner"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etReceiptentAddress">
+            app:layout_constraintTop_toBottomOf="@+id/etRecipientAddress">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/etBlockChainAdd"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"

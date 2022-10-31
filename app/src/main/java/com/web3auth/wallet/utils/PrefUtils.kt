@@ -76,6 +76,8 @@ fun View.show() {
     this.visibility = View.VISIBLE
 }
 
+fun Double.roundOff(): String = String.format("%.4f", this)
+
 fun View.hide() {
     this.visibility = View.GONE
 }
@@ -94,5 +96,6 @@ const val SESSION_ID = "sessionId"
 const val ISLOGGEDIN = "isLoggedIn"
 const val ISONBOARDED = "isOnboarded"
 const val PUBLICKEY = "publicKey"
+const val PRIVATEKEY = "privateKey"
 const val PRICE_IN_USD = "priceInUSD"
 

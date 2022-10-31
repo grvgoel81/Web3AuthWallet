@@ -4,8 +4,6 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.ViewGroup
@@ -17,7 +15,6 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.os.postDelayed
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
@@ -45,7 +42,7 @@ import java.math.BigInteger
 
 class TransferAssetsActivity : AppCompatActivity() {
 
-    private lateinit var etReceiptentAddress: AppCompatEditText
+    private lateinit var etRecipientAddress: AppCompatEditText
     private lateinit var etAmountToSend: AppCompatEditText
     private lateinit var etMaxTransFee: AppCompatEditText
     private lateinit var web3: Web3j
@@ -79,23 +76,23 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun setUpListeners() {
-        etReceiptentAddress = findViewById(R.id.etReceiptentAddress)
+        etRecipientAddress = findViewById(R.id.etRecipientAddress)
         etAmountToSend = findViewById(R.id.etAmountToSend)
         etMaxTransFee = findViewById(R.id.etMaxTransFee)
         tvEth = findViewById(R.id.tvEth)
         tvUSD = findViewById(R.id.tvUSD)
         tvTotalAmount = findViewById(R.id.tvTotalAmount)
         tvCostInETH = findViewById(R.id.tvCostInETH)
-        val etBlockChain = findViewById<AppCompatTextView>(R.id.etBlockChain)
-        val etBlockChainAdd = findViewById<AppCompatTextView>(R.id.etBlockChainAdd)
+        val etBlockChain = findViewById<AppCompatEditText>(R.id.etBlockChain)
+        val etBlockChainAdd = findViewById<AppCompatEditText>(R.id.etBlockChainAdd)
         blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum").toString()
         network = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
         publicAddress = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PUBLICKEY, "").toString()
         sessionID = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(SESSION_ID, "").toString()
         priceInUSD = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PRICE_IN_USD, "").toString()
 
-        etBlockChainAdd.text = blockChain.let { Web3AuthUtils.getBlockChainName(it) }
-        etBlockChain.text = blockChain
+        etBlockChainAdd.setText(blockChain.let { Web3AuthUtils.getBlockChainName(it) })
+        etBlockChain.setText(blockChain)
 
         findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressed() }
         findViewById<AppCompatImageView>(R.id.ivScan).setOnClickListener { scanQRCode() }
@@ -130,11 +127,10 @@ class TransferAssetsActivity : AppCompatActivity() {
         })
 
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
-            //signMessage(Web3AuthUtils.getPrivateKey(sessionID), "0xE84D601E5D945031129a83E5602be0CC7f182Cf3"/*etReceiptentAddress.text.toString()*/, 0.00012)
             if (isValidDetails()) {
                 showConfirmTransactionDialog(
                     publicAddress,
-                    etReceiptentAddress.text.toString(),
+                    etRecipientAddress.text.toString(),
                     etAmountToSend.text.toString(),
                     gasFee, processTime,
                     tvTotalAmount.text.toString(),
@@ -149,8 +145,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun configureWeb3j() {
-        val url =
-            "https://rpc-mumbai.maticvigil.com/" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
+        val url = "https://rpc-mumbai.maticvigil.com/" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
         web3 = Web3j.build(HttpService(url))
         try {
             val clientVersion: Web3ClientVersion = web3.web3ClientVersion().sendAsync().get()
@@ -181,7 +176,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                 ).show()
             }
         } else {
-            etReceiptentAddress.setText(result.contents)
+            etRecipientAddress.setText(result.contents)
         }
     }
 
@@ -191,7 +186,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                 ApiHelper.getEthInstance().create(Web3AuthApi::class.java)
             val result = web3AuthApi.getMaxTransactionConfig()
             if (result.isSuccessful && result.body() != null) {
-                Handler(Looper.getMainLooper()).postDelayed(10) {
+                runOnUiThread {
                     ethGasAPIResponse = result.body()!!
                     setMaxTransFee(ethGasAPIResponse.fastest)
                     gasFee = ethGasAPIResponse.fastest
@@ -202,10 +197,10 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun isValidDetails(): Boolean {
-        return if(etReceiptentAddress.text?.isNullOrEmpty() == true) {
+        return if(etRecipientAddress.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_address))
             false
-        } else if (!Web3AuthUtils.isValidEthAddress(etReceiptentAddress.text.toString().trim())) {
+        } else if (!Web3AuthUtils.isValidEthAddress(etRecipientAddress.text.toString().trim())) {
             toast(getString(R.string.correct_address))
             false
         } else if(etAmountToSend.text?.isNullOrEmpty() == true) {
@@ -229,11 +224,11 @@ class TransferAssetsActivity : AppCompatActivity() {
                     BigDecimal.valueOf(amountToBeSent),
                     Convert.Unit.ETHER
                 ).send()
-                Handler(Looper.getMainLooper()).postDelayed(10) {
+                runOnUiThread {
                     toast("Transaction successful: " + receipt.transactionHash)
                 }
             } catch (e: java.lang.Exception) {
-                Handler(Looper.getMainLooper()).postDelayed(10) {
+                runOnUiThread {
                     toast("low balance")
                 }
             }
@@ -357,8 +352,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         btnConfirm.setOnClickListener {
             clTransaction.hide()
             clProgressBar.show()
-            signMessage(transDialog, Web3AuthUtils.getPrivateKey(sessionID), receiptAdd, totalAmountInEth.split(" ")[0].toDouble())
-            //showTransactionDialog(TransactionStatus.PLACED)
+            signMessage(transDialog, sessionID, receiptAdd, totalAmountInEth.split(" ")[0].toDouble())
         }
         tvCancel.setOnClickListener {
             transDialog.dismiss()
@@ -388,7 +382,8 @@ class TransferAssetsActivity : AppCompatActivity() {
         GlobalScope.launch {
             try {
                 val credentials: Credentials = Credentials.create(privateKey)
-                println("Account address: " + credentials.address)
+                println("Account address: $publicAddress")
+                println("Credentials Address: ${credentials.address}")
                 println(
                     "Balance: " + Convert.fromWei(
                         web3.ethGetBalance(credentials.address, DefaultBlockParameterName.LATEST)
@@ -396,7 +391,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                     )
                 )
                 val ethGetTransactionCount: EthGetTransactionCount = web3.ethGetTransactionCount(
-                    credentials.address,
+                    publicAddress,
                     DefaultBlockParameterName.LATEST
                 ).send()
                 val nonce: BigInteger = ethGetTransactionCount.transactionCount
@@ -410,7 +405,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                     gasLimit,
                     recipientAddress,
                     value,
-                    "" , BigInteger.valueOf(1), BigInteger.valueOf(35)
+                    "" , BigInteger.valueOf(2), BigInteger.valueOf(50)
                 )
                 // Sign the transaction
                 val signedMessage: ByteArray =

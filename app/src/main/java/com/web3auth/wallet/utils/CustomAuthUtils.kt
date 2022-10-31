@@ -3,8 +3,10 @@ package com.web3auth.wallet.utils
 import org.torusresearch.fetchnodedetails.FetchNodeDetails
 import org.torusresearch.torusutils.TorusUtils
 import org.torusresearch.torusutils.helpers.Utils
+import org.torusresearch.torusutils.types.RetrieveSharesResponse
 import org.torusresearch.torusutils.types.TorusCtorOptions
 import org.torusresearch.torusutils.types.VerifierArgs
+import java.math.BigInteger
 import java.util.concurrent.ExecutionException
 
 class CustomAuth(_customAuthArgs: CustomAuthArgs) {
@@ -36,11 +38,20 @@ class CustomAuth(_customAuthArgs: CustomAuthArgs) {
     }
 
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun getEthAddress(verifier: String?, verifierId: String?)
-    : String {
+    fun getEthAddress(verifier: String?, verifierId: String?): String {
         val nodeDetails = nodeDetailManager?.getNodeDetails(verifier, verifierId)?.get()
         // this function creates a wallet if not doesn't exist
+
         return torusUtils.getPublicAddress(nodeDetails?.torusNodeEndpoints, nodeDetails?.torusNodePub,
             VerifierArgs(verifier, verifierId)).get().address
+    }
+
+    fun getTorusKey(verifier: String?, verifierId: String?, idToken: String): Pair<String, BigInteger> {
+        val nodeDetails = nodeDetailManager?.getNodeDetails(verifier, verifierId)?.get()
+        val verifierParamsHashMap: HashMap<String, Any> = HashMap()
+        verifierParamsHashMap["verifier_id"] = verifierId!!
+        var retrieveSharesResponse = torusUtils.retrieveShares(nodeDetails?.torusNodeEndpoints, nodeDetails?.torusIndexes,
+            verifier, verifierParamsHashMap, idToken).get()
+        return Pair(retrieveSharesResponse.ethAddress ,retrieveSharesResponse.privKey)
     }
 }

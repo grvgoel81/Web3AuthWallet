@@ -13,8 +13,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -22,70 +20,59 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.os.postDelayed
-import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import com.web3auth.core.Web3Auth
-import com.web3auth.core.getCustomTabsBrowsers
-import com.web3auth.core.getDefaultBrowser
 import com.web3auth.core.types.Web3AuthOptions
 import com.web3auth.core.types.Web3AuthResponse
 import com.web3auth.core.types.WhiteLabelData
-import com.web3auth.wallet.api.ApiHelper
-import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.utils.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.web3j.crypto.*
-import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.DefaultBlockParameterName
-import org.web3j.protocol.core.methods.response.EthGetBalance
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount
-import org.web3j.protocol.core.methods.response.EthSendTransaction
-import org.web3j.protocol.core.methods.response.Web3ClientVersion
-import org.web3j.protocol.http.HttpService
-import org.web3j.utils.Convert
+import com.web3auth.wallet.viewmodel.EthereumViewModel
+import org.web3j.crypto.Credentials
+import org.web3j.crypto.Hash
+import org.web3j.crypto.Sign
 import org.web3j.utils.Numeric
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var web3Auth: Web3Auth
     private var web3AuthResponse: Web3AuthResponse? = null
-    private lateinit var web3: Web3j
     private lateinit var blockChain: String
     private lateinit var publicAddress: String
-    private lateinit var web3Balance: EthGetBalance
     private lateinit var selectedNetwork: String
     private lateinit var tvExchangeRate: AppCompatTextView
     private lateinit var tvPriceInUSD: AppCompatTextView
-    private lateinit var priceInUSD: String
+    private var priceInUSD: String = ""
     private lateinit var etMessage: AppCompatEditText
     private lateinit var btnSign: AppCompatButton
     private lateinit var tvBalance: AppCompatTextView
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var balance: BigDecimal
+    private lateinit var ethereumViewModel: EthereumViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
+        ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
         selectedNetwork =
             Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
                 .toString()
+        blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
+            .toString()
         showProgressDialog()
         if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
             progressDialog.hide()
             longToast(getString(R.string.connect_to_internet))
             return
         }
-        configureWeb3j()
-        configureWeb3Auth()
         setData()
+        configureWeb3Auth()
+        observeListeners()
         setUpListeners()
     }
 
@@ -115,25 +102,61 @@ class MainActivity : AppCompatActivity() {
         web3Auth.setResultUrl(intent.data)
         web3AuthResponse =
             Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
-        web3AuthResponse?.let { getEthAddress(it) }
+
+        ethereumViewModel.getPublicAddress(web3AuthResponse?.sessionId.toString())
 
         findViewById<AppCompatTextView>(R.id.tvName).text = "Welcome ".plus(
             web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
         ).plus("!")
         findViewById<AppCompatTextView>(R.id.tvEmail).text = web3AuthResponse?.userInfo?.email
+        setData()
     }
 
-    private fun configureWeb3j() {
-        val url =
-            "https://rpc-mumbai.maticvigil.com/" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
-        web3 = Web3j.build(HttpService(url))
-        try {
-            val clientVersion: Web3ClientVersion = web3.web3ClientVersion().sendAsync().get()
-            if (clientVersion.hasError()) {
+    private fun observeListeners() {
+        ethereumViewModel.isWeb3Configured.observe(this) {
+            if (it == false) {
                 toast("Error connecting to Web3j")
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        }
+
+        ethereumViewModel.priceInUSD.observe(this) {
+            if(!it.isNullOrEmpty()) {
+                priceInUSD = it
+                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PRICE_IN_USD, priceInUSD)
+                tvExchangeRate.text = "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
+                    .plus(priceInUSD).plus(" " + getString(R.string.usd))
+                ethereumViewModel.retrieveBalance(publicAddress)
+            }
+        }
+
+        ethereumViewModel.publicAddress.observe(this) {
+            publicAddress = it
+            findViewById<AppCompatTextView>(R.id.tvAddress).text =
+                publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
+            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
+            if(blockChain == getString(R.string.solana)) {
+                getSolanaBalance(publicAddress)
+            } else {
+                if(publicAddress.isNotEmpty()) {
+                    ethereumViewModel.retrieveBalance(publicAddress)
+                }
+            }
+        }
+
+        ethereumViewModel.balance.observe(this) {
+            if (it > 0.0 && !priceInUSD.isNullOrEmpty()) {
+                try {
+                    Handler(Looper.getMainLooper()).postDelayed(100) {
+                        tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
+                        var usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
+                        tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
+                        progressDialog.hide()
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    progressDialog.dismiss()
+                }
+            }
         }
     }
 
@@ -167,8 +190,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setData() {
-        blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
-                .toString()
+        ethereumViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
         findViewById<AppCompatTextView>(R.id.tvNetwork).text =
             blockChain.plus(" ").plus(selectedNetwork)
 
@@ -176,75 +198,14 @@ class MainActivity : AppCompatActivity() {
             Web3AuthUtils.openCustomTabs(this@MainActivity,"https://mumbai.polygonscan.com/")
         }
 
-        getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
-
-        if(blockChain == getString(R.string.solana)) {
+        /*if(blockChain == getString(R.string.solana)) {
             SolanaManager.createWallet(NetworkUtils.getSolanaNetwork(selectedNetwork))
-        }
-    }
-
-    private fun getEthAddress(web3AuthResponse: Web3AuthResponse) {
-        val authArgs = CustomAuthArgs(NetworkUtils.getTorusNetwork(selectedNetwork))
-        authArgs.networkUrl =
-            "https://small-long-brook.ropsten.quiknode.pro/e2fd2eb01412e80623787d1c40094465aa67624a"
-        // Initialize CustomAuth
-        var torusSdk = CustomAuth(authArgs)
-        val verifier = web3AuthResponse.userInfo?.verifier
-        val verifierId = web3AuthResponse.userInfo?.verifierId
-
-        Executors.newSingleThreadExecutor().execute {
-            publicAddress = torusSdk.getEthAddress(verifier, verifierId)
-            runOnUiThread {
-                findViewById<AppCompatTextView>(R.id.tvAddress).text =
-                    publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
-                if(blockChain == getString(R.string.solana)) {
-                    getSolanaBalance(publicAddress)
-                } else {
-                    retrieveBalance(publicAddress)
-                }
-            }
-        }
-    }
-
-    private fun getCurrencyPriceInUSD(fsym: String, tsyms: String) {
-        GlobalScope.launch {
-            val web3AuthApi = ApiHelper.getTorusInstance().create(Web3AuthApi::class.java)
-            val result = web3AuthApi.getCurrencyPrice(fsym, tsyms)
-            if(result.isSuccessful && result.body() != null) {
-                Handler(Looper.getMainLooper()).postDelayed(10) {
-                    priceInUSD = result.body()?.USD.toString()
-                    Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PRICE_IN_USD, priceInUSD)
-                    tvExchangeRate.text = "1 ".plus(fsym).plus(" = ").plus(priceInUSD).plus(" $tsyms")
-                }
-            }
-        }
-    }
-
-    private fun retrieveBalance(publicAddress: String) {
-        Executors.newSingleThreadExecutor().execute {
-            try {
-                web3Balance = web3.ethGetBalance(
-                    publicAddress,
-                    DefaultBlockParameterName.LATEST
-                ).sendAsync()
-                    .get()
-            } catch (e: Exception) {
-                toast("balance failed")
-            }
-            runOnUiThread {
-                println("web3Balance: ${web3Balance.balance}" )
-                tvBalance.text = Web3AuthUtils.toWeiEther(web3Balance).toString()
-                var usdPrice = Web3AuthUtils.getPriceInUSD(web3Balance.balance.toDouble(), priceInUSD)
-                tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
-                progressDialog.hide()
-            }
-        }
+        }*/
     }
 
     private fun getSolanaBalance(publicAddress: String) {
         tvBalance.text = SolanaManager.getBalance(publicAddress).toString()
-        var usdPrice = Web3AuthUtils.getPriceInUSD(SolanaManager.getBalance(publicAddress).toDouble(), priceInUSD)
+        var usdPrice = Web3AuthUtils.getPriceInUSD(SolanaManager.getBalance(publicAddress).toDouble(), priceInUSD.toDouble())
         tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
         progressDialog.hide()
     }

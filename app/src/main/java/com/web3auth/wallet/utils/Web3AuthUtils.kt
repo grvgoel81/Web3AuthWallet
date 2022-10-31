@@ -53,10 +53,10 @@ object Web3AuthUtils {
 
     fun getEtherInWei() = 10.0.pow(18)
 
-    private fun getEtherInGwei() = 10.0.pow(9)
+    private fun getEtherInGwei() = 10.0.pow(10)
 
-    fun toWeiEther(ethBalance: EthGetBalance): Double {
-        var decimalWei = ethBalance.balance.toDouble()
+    fun toWeiEther(ethBalance: Double): Double {
+        var decimalWei = ethBalance
         return decimalWei / getEtherInWei()
     }
 
@@ -68,6 +68,11 @@ object Web3AuthUtils {
     fun getPrivateKey(sessionId: String): String {
         val derivedECKeyPair: ECKeyPair = ECKeyPair.create(BigInteger(sessionId, 16))
         return derivedECKeyPair.privateKey.toString(16)
+    }
+
+    fun getPublicKey(sessionId: String): String {
+        val derivedECKeyPair: ECKeyPair = ECKeyPair.create(BigInteger(sessionId, 16))
+        return derivedECKeyPair.publicKey.toString(16)
     }
 
     fun isValidEthAddress(address: String): Boolean {
@@ -95,7 +100,7 @@ object Web3AuthUtils {
         return  emojiRegex.containsMatchIn(input = message)
     }
 
-    fun getPriceInUSD(balance: Double, priceInUSD:String): BigDecimal =
+    fun getPriceInUSD(balance: Double, priceInUSD:Double): BigDecimal =
         BigDecimal(balance).multiply(BigDecimal(priceInUSD))/getEtherInWei().toBigDecimal()
 
     fun getPriceinUSD(ethAmount: Double, usdPrice: Double): Double = ethAmount * (usdPrice)
