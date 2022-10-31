@@ -15,30 +15,18 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import com.web3auth.wallet.api.ApiHelper
-import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.api.models.EthGasAPIResponse
 import com.web3auth.wallet.utils.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.web3j.crypto.Credentials
-import org.web3j.crypto.RawTransaction
-import org.web3j.crypto.TransactionEncoder
+import com.web3auth.wallet.viewmodel.EthereumViewModel
 import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.DefaultBlockParameterName
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount
-import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
-import org.web3j.tx.Transfer
-import org.web3j.utils.Convert
-import org.web3j.utils.Numeric
-import java.math.BigDecimal
-import java.math.BigInteger
+import java.util.*
 
 class TransferAssetsActivity : AppCompatActivity() {
 
@@ -48,6 +36,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var web3: Web3j
     private lateinit var publicAddress: String
     private lateinit var ethGasAPIResponse: EthGasAPIResponse
+    private lateinit var ethereumViewModel: EthereumViewModel
     private lateinit var blockChain: String
     private lateinit var network: String
     private lateinit var tvEth: AppCompatTextView
@@ -56,6 +45,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var tvCostInETH: AppCompatTextView
     private lateinit var sessionID: String
     private lateinit var priceInUSD: String
+    private lateinit var transDialog: Dialog
     private var totalCostinETH: Double = 0.0
     private var gasFee: Double = 0.0
     private var processTime:Double = 0.0
@@ -70,8 +60,9 @@ class TransferAssetsActivity : AppCompatActivity() {
             longToast(getString(R.string.connect_to_internet))
             return
         }
+        ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
         setUpListeners()
-        getMaxTransactionConfig()
+        //getMaxTransactionConfig()
         configureWeb3j()
     }
 
@@ -142,6 +133,27 @@ class TransferAssetsActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.tvEditTransFee).setOnClickListener {
             showMaxTransactionSelectDialog()
         }
+
+        ethereumViewModel.ethGasAPIResponse.observe(this) {
+            if(it != null) {
+                ethGasAPIResponse = it
+                setMaxTransFee(it.fastest)
+                gasFee = it.fastest
+                processTime = it.fastestWait
+            }
+        }
+
+        ethereumViewModel.transactionHash.observe(this) {
+            if(it.isNullOrEmpty()) return@observe
+            if(::transDialog.isInitialized) {
+                transDialog.dismiss()
+            }
+            if(it.isNotEmpty()) {
+                showTransactionDialog(TransactionStatus.SUCCESSFUL)
+            } else {
+                showTransactionDialog(TransactionStatus.FAILED)
+            }
+        }
     }
 
     private fun configureWeb3j() {
@@ -180,22 +192,6 @@ class TransferAssetsActivity : AppCompatActivity() {
         }
     }
 
-    private fun getMaxTransactionConfig() {
-        GlobalScope.launch {
-            val web3AuthApi =
-                ApiHelper.getEthInstance().create(Web3AuthApi::class.java)
-            val result = web3AuthApi.getMaxTransactionConfig()
-            if (result.isSuccessful && result.body() != null) {
-                runOnUiThread {
-                    ethGasAPIResponse = result.body()!!
-                    setMaxTransFee(ethGasAPIResponse.fastest)
-                    gasFee = ethGasAPIResponse.fastest
-                    processTime = ethGasAPIResponse.fastestWait
-                }
-            }
-        }
-    }
-
     private fun isValidDetails(): Boolean {
         return if(etRecipientAddress.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_address))
@@ -208,30 +204,6 @@ class TransferAssetsActivity : AppCompatActivity() {
             false
         } else {
             true
-        }
-    }
-
-    @Throws(java.lang.Exception::class)
-    fun makeTransaction(privateKey: String, recipientAddress: String,
-                        amountToBeSent: Double) {
-        GlobalScope.launch {
-            try {
-                val credentials: Credentials = Credentials.create(privateKey)
-                val receipt = Transfer.sendFunds(
-                    web3,
-                    credentials,
-                    recipientAddress,
-                    BigDecimal.valueOf(amountToBeSent),
-                    Convert.Unit.ETHER
-                ).send()
-                runOnUiThread {
-                    toast("Transaction successful: " + receipt.transactionHash)
-                }
-            } catch (e: java.lang.Exception) {
-                runOnUiThread {
-                    toast("low balance")
-                }
-            }
         }
     }
 
@@ -312,7 +284,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     private fun showConfirmTransactionDialog(senderAdd: String, receiptAdd: String, amountToBeSent: String,
         gasFee: Double, processTime: Double, totalAmountInEth: String, totalAmountInUSD: String
     ) {
-        val transDialog = Dialog(this@TransferAssetsActivity)
+        transDialog = Dialog(this@TransferAssetsActivity)
         transDialog.setContentView(R.layout.dialog_confirm_transaction)
         transDialog.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -352,7 +324,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         btnConfirm.setOnClickListener {
             clTransaction.hide()
             clProgressBar.show()
-            signMessage(transDialog, sessionID, receiptAdd, totalAmountInEth.split(" ")[0].toDouble())
+            ethereumViewModel.signMessage(transDialog, sessionID, receiptAdd, totalAmountInEth.split(" ")[0].toDouble())
         }
         tvCancel.setOnClickListener {
             transDialog.dismiss()
@@ -376,58 +348,6 @@ class TransferAssetsActivity : AppCompatActivity() {
             String.format("%.6f", totalCostinETH).plus(" " + Web3AuthUtils.getCurrency(blockChain))
         tvCostInETH.text = "= ".plus(String.format("%.6f", Web3AuthUtils.getPriceinUSD(totalCostinETH, priceInUSD.toDouble())))
             .plus(" ").plus(getString(R.string.usd))
-    }
-
-    private fun signMessage(transDialog: Dialog, privateKey: String, recipientAddress: String, amountToBeSent: Double) {
-        GlobalScope.launch {
-            try {
-                val credentials: Credentials = Credentials.create(privateKey)
-                println("Account address: $publicAddress")
-                println("Credentials Address: ${credentials.address}")
-                println(
-                    "Balance: " + Convert.fromWei(
-                        web3.ethGetBalance(credentials.address, DefaultBlockParameterName.LATEST)
-                            .send().balance.toString(), Convert.Unit.ETHER
-                    )
-                )
-                val ethGetTransactionCount: EthGetTransactionCount = web3.ethGetTransactionCount(
-                    publicAddress,
-                    DefaultBlockParameterName.LATEST
-                ).send()
-                val nonce: BigInteger = ethGetTransactionCount.transactionCount
-                val value: BigInteger =
-                    Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
-                val gasLimit: BigInteger = BigInteger.valueOf(21000)
-                val gasPrice: BigInteger =  Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.avgWait).toBigDecimal().toBigInteger()
-
-                val rawTransaction: RawTransaction = RawTransaction.createTransaction(80001,
-                    nonce,
-                    gasLimit,
-                    recipientAddress,
-                    value,
-                    "" , BigInteger.valueOf(2), BigInteger.valueOf(50)
-                )
-                // Sign the transaction
-                val signedMessage: ByteArray =
-                    TransactionEncoder.signMessage(rawTransaction, credentials)
-                val hexValue: String = Numeric.toHexString(signedMessage)
-                println("kexValue: $hexValue")
-                val ethSendTransaction: EthSendTransaction =
-                    web3.ethSendRawTransaction(hexValue).send()
-                val transactionHash: String = ethSendTransaction.transactionHash
-                println("transactionHash: $transactionHash")
-                runOnUiThread {
-                    showTransactionDialog(TransactionStatus.SUCCESSFUL)
-                    transDialog.dismiss()
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                runOnUiThread {
-                    showTransactionDialog(TransactionStatus.FAILED)
-                    transDialog.dismiss()
-                }
-            }
-        }
     }
 
     private fun showTransactionDialog(transactionStatus: TransactionStatus) {
@@ -476,5 +396,10 @@ class TransferAssetsActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModelStore.clear()
     }
 }

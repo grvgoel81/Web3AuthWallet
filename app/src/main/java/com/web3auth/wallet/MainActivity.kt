@@ -11,8 +11,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +18,6 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.os.postDelayed
 import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
@@ -66,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             .toString()
         showProgressDialog()
         if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
-            progressDialog.hide()
+            progressDialog.dismiss()
             longToast(getString(R.string.connect_to_internet))
             return
         }
@@ -145,17 +142,10 @@ class MainActivity : AppCompatActivity() {
 
         ethereumViewModel.balance.observe(this) {
             if (it > 0.0 && !priceInUSD.isNullOrEmpty()) {
-                try {
-                    Handler(Looper.getMainLooper()).postDelayed(100) {
-                        tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
-                        var usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
-                        tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
-                        progressDialog.hide()
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
+                    tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
+                    var usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
+                    tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
                     progressDialog.dismiss()
-                }
             }
         }
     }
@@ -177,10 +167,10 @@ class MainActivity : AppCompatActivity() {
 
         btnSign.setOnClickListener {
             if(etMessage.text.toString().isNullOrEmpty() || Web3AuthUtils.containsEmoji(etMessage.text.toString())) {
-                toast("Invalid message")
+                toast(getString(R.string.invalid_message))
                 return@setOnClickListener
             }
-            var signatureHash = getSignature(web3AuthResponse?.sessionId.toString(), etMessage.text.toString())
+            var signatureHash = ethereumViewModel.getSignature(web3AuthResponse?.sessionId.toString(), etMessage.text.toString())
             if(signatureHash.isNullOrEmpty()) {
                 showSignTransactionDialog(false)
             } else {
@@ -207,17 +197,7 @@ class MainActivity : AppCompatActivity() {
         tvBalance.text = SolanaManager.getBalance(publicAddress).toString()
         var usdPrice = Web3AuthUtils.getPriceInUSD(SolanaManager.getBalance(publicAddress).toDouble(), priceInUSD.toDouble())
         tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
-        progressDialog.hide()
-    }
-
-    private fun getSignature(privateKey: String, message: String): String {
-        val credentials: Credentials = Credentials.create(privateKey)
-        val hashedData = Hash.sha3(message.toByteArray(StandardCharsets.UTF_8))
-        val signature = Sign.signMessage(hashedData, credentials.ecKeyPair)
-        val r = Numeric.toHexString(signature.r)
-        val s = Numeric.toHexString(signature.s).substring(2)
-        val v = Numeric.toHexString(signature.v).substring(2)
-        return StringBuilder(r).append(s).append(v).toString()
+        progressDialog.dismiss()
     }
 
     private fun showQRDialog(publicAddress: String) {
@@ -303,6 +283,7 @@ class MainActivity : AppCompatActivity() {
         logoutCompletableFuture.whenComplete { _, error ->
             if (error == null) {
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                viewModelStore.clear()
                 finish()
             } else {
                 Log.d("MainActivity_Web3Auth", error.message ?: "Something went wrong")

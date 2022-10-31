@@ -1,19 +1,27 @@
 package com.web3auth.wallet.viewmodel
 
+import android.app.Dialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.web3auth.wallet.api.ApiHelper
 import com.web3auth.wallet.api.Web3AuthApi
+import com.web3auth.wallet.api.models.EthGasAPIResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.web3j.crypto.Credentials
+import org.web3j.crypto.*
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.response.EthGetBalance
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount
+import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
+import org.web3j.utils.Convert
+import org.web3j.utils.Numeric
+import java.math.BigInteger
+import java.nio.charset.StandardCharsets
 
-class EthereumViewModel: ViewModel() {
+class EthereumViewModel : ViewModel() {
 
     private lateinit var web3: Web3j
     private lateinit var web3Balance: EthGetBalance
@@ -21,10 +29,12 @@ class EthereumViewModel: ViewModel() {
     var priceInUSD = MutableLiveData("")
     var publicAddress = MutableLiveData("")
     var balance = MutableLiveData(0.0)
-
+    var ethGasAPIResponse: MutableLiveData<EthGasAPIResponse> = MutableLiveData(null)
+    var transactionHash = MutableLiveData("")
 
     init {
         configureWeb3j()
+        getMaxTransactionConfig()
     }
 
     private fun configureWeb3j() {
@@ -64,5 +74,68 @@ class EthereumViewModel: ViewModel() {
                 .get()
             balance.postValue(web3Balance.balance.toDouble())
         }
+    }
+
+    fun getSignature(privateKey: String, message: String): String {
+        val credentials: Credentials = Credentials.create(privateKey)
+        val hashedData = Hash.sha3(message.toByteArray(StandardCharsets.UTF_8))
+        val signature = Sign.signMessage(hashedData, credentials.ecKeyPair)
+        val r = Numeric.toHexString(signature.r)
+        val s = Numeric.toHexString(signature.s).substring(2)
+        val v = Numeric.toHexString(signature.v).substring(2)
+        return StringBuilder(r).append(s).append(v).toString()
+    }
+
+    private fun getMaxTransactionConfig() {
+        GlobalScope.launch {
+            val web3AuthApi = ApiHelper.getEthInstance().create(Web3AuthApi::class.java)
+            val result = web3AuthApi.getMaxTransactionConfig()
+            if (result.isSuccessful && result.body() != null) {
+                ethGasAPIResponse.postValue(result.body() as EthGasAPIResponse)
+            }
+        }
+    }
+
+    fun signMessage(
+        transDialog: Dialog,
+        privateKey: String,
+        recipientAddress: String,
+        amountToBeSent: Double
+    ) {
+        GlobalScope.launch {
+            try {
+                val credentials: Credentials = Credentials.create(privateKey)
+                val ethGetTransactionCount: EthGetTransactionCount = web3.ethGetTransactionCount(
+                    credentials.address,
+                    DefaultBlockParameterName.LATEST
+                ).send()
+                val nonce: BigInteger = ethGetTransactionCount.transactionCount
+                val value: BigInteger =
+                    Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
+                val gasLimit: BigInteger = BigInteger.valueOf(21000)
+
+                val rawTransaction: RawTransaction = RawTransaction.createTransaction(
+                    80001,
+                    nonce,
+                    gasLimit,
+                    recipientAddress,
+                    value,
+                    "", BigInteger.valueOf(2), BigInteger.valueOf(50)
+                )
+                // Sign the transaction
+                val signedMessage: ByteArray =
+                    TransactionEncoder.signMessage(rawTransaction, credentials)
+                val hexValue: String = Numeric.toHexString(signedMessage)
+                val ethSendTransaction: EthSendTransaction =
+                    web3.ethSendRawTransaction(hexValue).send()
+                transactionHash.postValue(ethSendTransaction.transactionHash)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }
