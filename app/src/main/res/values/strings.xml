@@ -9,6 +9,7 @@
     <string name="continue_with_email">Continue with Email</string>
     <string name="email">Email</string>
     <string name="address">Address</string>
+    <string name="welcome">Welcome</string>
     <string name="account_details">Account Details</string>
     <string name="account_balance">Account Balance</string>
     <string name="transfer_assets">Transfer assets</string>

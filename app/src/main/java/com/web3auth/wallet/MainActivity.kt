@@ -26,7 +26,6 @@ import com.web3auth.core.types.Web3AuthResponse
 import com.web3auth.core.types.WhiteLabelData
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
-import java.math.BigDecimal
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnSign: AppCompatButton
     private lateinit var tvBalance: AppCompatTextView
     private lateinit var progressDialog: ProgressDialog
-    private lateinit var balance: BigDecimal
     private lateinit var ethereumViewModel: EthereumViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,9 +49,9 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
         selectedNetwork =
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet")
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
                 .toString()
-        blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum")
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "Ethereum")
             .toString()
         showProgressDialog()
         if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
@@ -92,11 +90,11 @@ class MainActivity : AppCompatActivity() {
         web3Auth.setResultUrl(intent.data)
 
         web3AuthResponse =
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getObject(LOGIN_RESPONSE)
 
         ethereumViewModel.getPublicAddress(web3AuthResponse?.sessionId.toString())
 
-        findViewById<AppCompatTextView>(R.id.tvName).text = "Welcome ".plus(
+        findViewById<AppCompatTextView>(R.id.tvName).text = getString(R.string.welcome).plus(" ").plus(
             web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
         ).plus("!")
         findViewById<AppCompatTextView>(R.id.tvEmail).text = web3AuthResponse?.userInfo?.email
@@ -113,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         ethereumViewModel.priceInUSD.observe(this) {
             if(!it.isNullOrEmpty()) {
                 priceInUSD = it
-                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PRICE_IN_USD, priceInUSD)
+                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
                 tvExchangeRate.text = "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
                     .plus(priceInUSD).plus(" " + getString(R.string.usd))
                 ethereumViewModel.retrieveBalance(publicAddress)
@@ -135,9 +133,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         ethereumViewModel.balance.observe(this) {
-            if (it > 0.0 && !priceInUSD.isNullOrEmpty()) {
+            if (it > 0.0 && priceInUSD.isNotEmpty()) {
                     tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
-                    var usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
+                    val usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
                     tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
                     progressDialog.dismiss()
             }
@@ -169,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             var signatureHash = ethereumViewModel.getSignature(web3AuthResponse?.sessionId.toString(), etMessage.text.toString())
-            if(signatureHash.isNullOrEmpty()) {
+            if(signatureHash.isEmpty()) {
                 showSignTransactionDialog(false)
             } else {
                 showSignTransactionDialog(true, signatureHash)
@@ -191,14 +189,14 @@ class MainActivity : AppCompatActivity() {
             Web3AuthUtils.openCustomTabs(this@MainActivity,"https://mumbai.polygonscan.com/")
         }
 
-        /*if(blockChain == getString(R.string.solana)) {
+        if(blockChain == getString(R.string.solana)) {
             SolanaManager.createWallet(NetworkUtils.getSolanaNetwork(selectedNetwork))
-        }*/
+        }
     }
 
     private fun getSolanaBalance(publicAddress: String) {
         tvBalance.text = SolanaManager.getBalance(publicAddress).toString()
-        var usdPrice = Web3AuthUtils.getPriceInUSD(SolanaManager.getBalance(publicAddress).toDouble(), priceInUSD.toDouble())
+        val usdPrice = Web3AuthUtils.getPriceInUSD(SolanaManager.getBalance(publicAddress).toDouble(), priceInUSD.toDouble())
         tvPriceInUSD.text = "= ".plus(usdPrice).plus(" USD")
         progressDialog.dismiss()
     }
