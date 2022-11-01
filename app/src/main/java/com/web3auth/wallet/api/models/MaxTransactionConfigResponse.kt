@@ -11,10 +11,3 @@ data class EthGasAPIResponse(
     val fastestWait: Double,
     val fastWait: Double
 )
-
-data class Params(
-    val minWaitTimeEstimate: Double? = null,
-    val maxWaitTimeEstimate: Double? = null,
-    val suggestedMaxPriorityFeePerGas: String? = null,
-    val suggestedMaxFeePerGas: String? = null
-)

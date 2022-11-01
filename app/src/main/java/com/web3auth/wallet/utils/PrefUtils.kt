@@ -88,7 +88,7 @@ enum class TransactionStatus {
     PENDING,
     FAILED
 }
-const val ETH_Address = "ethAddress"
+
 const val NETWORK = "network"
 const val BLOCKCHAIN = "blockchain"
 const val LOGIN_RESPONSE= "login-response"
@@ -96,6 +96,7 @@ const val SESSION_ID = "sessionId"
 const val ISLOGGEDIN = "isLoggedIn"
 const val ISONBOARDED = "isOnboarded"
 const val PUBLICKEY = "publicKey"
-const val PRIVATEKEY = "privateKey"
 const val PRICE_IN_USD = "priceInUSD"
+const val LOGOUT = "logout"
+const val DATA = "data"
 

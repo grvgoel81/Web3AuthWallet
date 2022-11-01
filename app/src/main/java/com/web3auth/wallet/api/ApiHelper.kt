@@ -11,6 +11,7 @@ object ApiHelper {
 
     private const val baseUrl = "https://api.tor.us"
     private const val ethUrl = "https://ethgasstation.info"
+    private const val mockGasUrl = "https://mock-gas-server.herokuapp.com"
 
     private val okHttpClient = OkHttpClient().newBuilder()
         .addInterceptor(HttpLoggingInterceptor().apply {
@@ -31,6 +32,13 @@ object ApiHelper {
 
     fun getEthInstance(): Retrofit {
         return Retrofit.Builder().baseUrl(ethUrl)
+            .addConverterFactory(GsonConverterFactory.create(builder))
+            .client(okHttpClient)
+            .build()
+    }
+
+    fun getMockGasInstance(): Retrofit {
+        return Retrofit.Builder().baseUrl(mockGasUrl)
             .addConverterFactory(GsonConverterFactory.create(builder))
             .client(okHttpClient)
             .build()

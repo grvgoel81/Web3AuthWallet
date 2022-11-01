@@ -11,7 +11,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -27,12 +26,7 @@ import com.web3auth.core.types.Web3AuthResponse
 import com.web3auth.core.types.WhiteLabelData
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
-import org.web3j.crypto.Credentials
-import org.web3j.crypto.Hash
-import org.web3j.crypto.Sign
-import org.web3j.utils.Numeric
 import java.math.BigDecimal
-import java.nio.charset.StandardCharsets
 
 class MainActivity : AppCompatActivity() {
 
@@ -95,8 +89,8 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         ).also { web3Auth = it }
-
         web3Auth.setResultUrl(intent.data)
+
         web3AuthResponse =
             Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getObject(LOGIN_RESPONSE)
 
@@ -130,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             publicAddress = it
             findViewById<AppCompatTextView>(R.id.tvAddress).text =
                 publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(PUBLICKEY, publicAddress)
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
             if(blockChain == getString(R.string.solana)) {
                 getSolanaBalance(publicAddress)
             } else {
@@ -157,7 +151,11 @@ class MainActivity : AppCompatActivity() {
         btnSign = findViewById(R.id.btnSign)
         tvBalance = findViewById(R.id.tvBalance)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
-            startActivity(Intent(this@MainActivity, TransferAssetsActivity::class.java))
+            val intent = Intent(this@MainActivity, TransferAssetsActivity::class.java)
+            if(etMessage.text.toString().trim().isNotEmpty()) {
+                intent.putExtra(DATA, etMessage.text.toString())
+            }
+            startActivity(intent)
         }
         findViewById<AppCompatImageView>(R.id.ivLogout).setOnClickListener { logout() }
         findViewById<AppCompatTextView>(R.id.tvLogout).setOnClickListener { logout() }
@@ -177,6 +175,11 @@ class MainActivity : AppCompatActivity() {
                 showSignTransactionDialog(true, signatureHash)
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        web3Auth.setResultUrl(intent?.data)
     }
 
     private fun setData() {
@@ -278,16 +281,18 @@ class MainActivity : AppCompatActivity() {
         toast("Text Copied")
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        ethereumViewModel.retrieveBalance(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(PUBLICKEY, "").toString())
+    }
+
     private fun logout() {
-        val logoutCompletableFuture = web3Auth.logout()
-        logoutCompletableFuture.whenComplete { _, error ->
-            if (error == null) {
-                startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-                viewModelStore.clear()
-                finish()
-            } else {
-                Log.d("MainActivity_Web3Auth", error.message ?: "Something went wrong")
-            }
-        }
+        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISLOGGEDIN] = false
+        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = false
+        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGOUT] = false
+        Web3AuthWalletApp.getContext().web3AuthWalletPreferences.edit().clear().apply()
+        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }

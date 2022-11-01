@@ -1,5 +1,6 @@
 package com.web3auth.wallet
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -26,6 +27,7 @@ class OnBoardingActivity: AppCompatActivity() {
     private lateinit var web3Auth: Web3Auth
     private lateinit var selectedNetwork: String
     private lateinit var ivFullLogin: AppCompatImageView
+    private lateinit var context: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +50,7 @@ class OnBoardingActivity: AppCompatActivity() {
                 true
             }
         }
-        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressed() }
+        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         findViewById<AppCompatButton>(R.id.btnContinue).setOnClickListener { signIn(Provider.EMAIL_PASSWORDLESS) }
         findViewById<AppCompatImageView>(R.id.ivGoogle).setOnClickListener { signIn(Provider.GOOGLE) }
         findViewById<AppCompatImageView>(R.id.ivFacebook).setOnClickListener { signIn(Provider.FACEBOOK) }
@@ -65,7 +67,8 @@ class OnBoardingActivity: AppCompatActivity() {
     }
 
     private fun configureWeb3Auth() {
-        selectedNetwork = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "").toString()
+        selectedNetwork = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "")
+            .toString()
         web3Auth = Web3Auth(
             Web3AuthOptions(context = this,
                 clientId = getString(R.string.web3auth_project_id),
@@ -100,10 +103,10 @@ class OnBoardingActivity: AppCompatActivity() {
         )
         loginCompletableFuture.whenComplete { loginResponse, error ->
             if (error == null) {
-                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(LOGIN_RESPONSE, loginResponse)
-                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(SESSION_ID, loginResponse.sessionId.toString())
+                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGIN_RESPONSE] = loginResponse
+                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[SESSION_ID] = loginResponse.sessionId.toString()
                 startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
-                Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(ISONBOARDED, true)
+                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = true
             } else {
                 Log.d("OnBoardingError", error.message ?: "Something went wrong" )
             }

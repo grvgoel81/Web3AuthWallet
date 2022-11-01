@@ -11,7 +11,7 @@ open class Web3AuthWalletApp : Application() {
 
     companion object {
         lateinit var mInstance: Web3AuthWalletApp
-        fun getContext(): Context? {
+        fun getContext(): Context {
             return mInstance.applicationContext
         }
     }

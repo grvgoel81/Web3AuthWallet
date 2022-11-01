@@ -69,14 +69,10 @@
     <string-array name="blockchains">
         <item>Ethereum</item>
         <item>Solana</item>
-        <item>Binance</item>
-        <item>Polygon</item>
     </string-array>
 
     <string-array name="networkAddress">
         <item>Eth Address</item>
         <item>Solana Address</item>
-        <item>Binance Address</item>
-        <item>Polygon Address</item>
     </string-array>
 </resources>

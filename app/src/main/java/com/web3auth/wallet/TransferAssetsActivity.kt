@@ -21,12 +21,13 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import com.web3auth.wallet.api.models.EthGasAPIResponse
+import com.web3auth.wallet.api.models.GasApiResponse
+import com.web3auth.wallet.api.models.Params
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
-import java.util.*
 
 class TransferAssetsActivity : AppCompatActivity() {
 
@@ -39,6 +40,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var ethereumViewModel: EthereumViewModel
     private lateinit var blockChain: String
     private lateinit var network: String
+    private lateinit var gasApiResponse: GasApiResponse
     private lateinit var tvEth: AppCompatTextView
     private lateinit var tvUSD: AppCompatTextView
     private lateinit var tvTotalAmount: AppCompatTextView
@@ -46,11 +48,11 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var sessionID: String
     private lateinit var priceInUSD: String
     private lateinit var transDialog: Dialog
+    private lateinit var selectedGasParams: Params
     private var totalCostinETH: Double = 0.0
     private var gasFee: Double = 0.0
     private var processTime:Double = 0.0
     private var isEthSelected: Boolean = true
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +63,8 @@ class TransferAssetsActivity : AppCompatActivity() {
             return
         }
         ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
+        ethereumViewModel.getGasConfig()
         setUpListeners()
-        //getMaxTransactionConfig()
         configureWeb3j()
     }
 
@@ -152,6 +154,13 @@ class TransferAssetsActivity : AppCompatActivity() {
                 showTransactionDialog(TransactionStatus.SUCCESSFUL)
             } else {
                 showTransactionDialog(TransactionStatus.FAILED)
+            }
+        }
+
+        ethereumViewModel.gasAPIResponse.observe(this) {
+            if(it != null) {
+                gasApiResponse = it
+                it.high?.let { it1 -> setGasParams(it1) }
             }
         }
     }
@@ -248,28 +257,31 @@ class TransferAssetsActivity : AppCompatActivity() {
         rbFast.setOnClickListener {
             rbAvg.isChecked = false
             rbSlow.isChecked = false
-            dialog.dismiss()
             gasFee = ethGasAPIResponse.fastest
             processTime = ethGasAPIResponse.fastestWait
+            gasApiResponse.high?.let { it1 -> setGasParams(it1) }
             setMaxTransFee(ethGasAPIResponse.fastest)
+            dialog.dismiss()
         }
 
         rbAvg.setOnClickListener {
             rbFast.isChecked = false
             rbSlow.isChecked = false
-            dialog.dismiss()
             gasFee = ethGasAPIResponse.fast
             processTime = ethGasAPIResponse.fastWait
+            gasApiResponse.medium?.let { it1 -> setGasParams(it1) }
             setMaxTransFee(ethGasAPIResponse.fast)
+            dialog.dismiss()
         }
 
         rbSlow.setOnClickListener {
             rbAvg.isChecked = false
             rbFast.isChecked = false
-            dialog.dismiss()
             gasFee = ethGasAPIResponse.average
             processTime = ethGasAPIResponse.avgWait
+            gasApiResponse.low?.let { it1 -> setGasParams(it1) }
             setMaxTransFee(ethGasAPIResponse.average)
+            dialog.dismiss()
         }
 
         btnSave.setOnClickListener {
@@ -279,6 +291,12 @@ class TransferAssetsActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    private fun setGasParams(params: Params) {
+        if(params != null) {
+            selectedGasParams = params
+        }
     }
 
     private fun showConfirmTransactionDialog(senderAdd: String, receiptAdd: String, amountToBeSent: String,
@@ -324,7 +342,13 @@ class TransferAssetsActivity : AppCompatActivity() {
         btnConfirm.setOnClickListener {
             clTransaction.hide()
             clProgressBar.show()
-            ethereumViewModel.signMessage(transDialog, sessionID, receiptAdd, totalAmountInEth.split(" ")[0].toDouble())
+            ethereumViewModel.sendTransaction(
+                sessionID,
+                receiptAdd,
+                totalAmountInEth.split(" ")[0].toDouble(),
+                intent.getStringExtra(DATA),
+                selectedGasParams
+            )
         }
         tvCancel.setOnClickListener {
             transDialog.dismiss()
@@ -384,6 +408,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                 tvStatus.text = getString(R.string.try_again)
                 tvStatus.setOnClickListener {
                     dialog.dismiss()
+                    onBackPressedDispatcher.onBackPressed()
                 }
             }
             else -> {
@@ -394,6 +419,7 @@ class TransferAssetsActivity : AppCompatActivity() {
 
         icCLose.setOnClickListener {
             dialog.dismiss()
+            onBackPressedDispatcher.onBackPressed()
         }
         dialog.show()
     }

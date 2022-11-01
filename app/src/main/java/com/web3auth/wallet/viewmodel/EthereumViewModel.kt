@@ -1,11 +1,12 @@
 package com.web3auth.wallet.viewmodel
 
-import android.app.Dialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.web3auth.wallet.api.ApiHelper
 import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.api.models.EthGasAPIResponse
+import com.web3auth.wallet.api.models.GasApiResponse
+import com.web3auth.wallet.api.models.Params
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.web3j.crypto.*
@@ -31,6 +32,7 @@ class EthereumViewModel : ViewModel() {
     var balance = MutableLiveData(0.0)
     var ethGasAPIResponse: MutableLiveData<EthGasAPIResponse> = MutableLiveData(null)
     var transactionHash = MutableLiveData("")
+    var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
 
     init {
         configureWeb3j()
@@ -96,11 +98,22 @@ class EthereumViewModel : ViewModel() {
         }
     }
 
-    fun signMessage(
-        transDialog: Dialog,
+    fun getGasConfig() {
+        GlobalScope.launch {
+            val web3AuthApi = ApiHelper.getMockGasInstance().create(Web3AuthApi::class.java)
+            val result = web3AuthApi.getGasConfig()
+            if (result.isSuccessful && result.body() != null) {
+                gasAPIResponse.postValue(result.body() as GasApiResponse)
+            }
+        }
+    }
+
+    fun sendTransaction(
         privateKey: String,
         recipientAddress: String,
-        amountToBeSent: Double
+        amountToBeSent: Double,
+        data: String?,
+        params: Params
     ) {
         GlobalScope.launch {
             try {
@@ -120,7 +133,9 @@ class EthereumViewModel : ViewModel() {
                     gasLimit,
                     recipientAddress,
                     value,
-                    "", BigInteger.valueOf(2), BigInteger.valueOf(50)
+                    data ?: "",
+                    BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 7),
+                    BigInteger.valueOf(params.suggestedMaxFeePerGas?.toLong() ?: 70)
                 )
                 // Sign the transaction
                 val signedMessage: ByteArray =
@@ -133,9 +148,5 @@ class EthereumViewModel : ViewModel() {
                 ex.printStackTrace()
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }
