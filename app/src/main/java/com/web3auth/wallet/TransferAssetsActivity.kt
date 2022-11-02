@@ -16,7 +16,6 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
@@ -27,6 +26,7 @@ import com.web3auth.wallet.api.models.GasApiResponse
 import com.web3auth.wallet.api.models.Params
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
+import com.web3auth.wallet.viewmodel.SolanaViewModel
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
@@ -42,6 +42,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var ethereumViewModel: EthereumViewModel
     private lateinit var blockChain: String
     private lateinit var network: String
+    private lateinit var solanaViewModel: SolanaViewModel
     private lateinit var gasApiResponse: GasApiResponse
     private lateinit var tvEth: AppCompatTextView
     private lateinit var tvUSD: AppCompatTextView
@@ -54,9 +55,10 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var transDialog: Dialog
     private lateinit var selectedGasParams: Params
     private var totalCostinETH: Double = 0.0
+    private var totalAmountInSol: Double = 0.0
     private var gasFee: Double = 0.0
     private var processTime:Double = 0.0
-    private var isEthSelected: Boolean = true
+    private var isUSDSelected: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,10 +68,19 @@ class TransferAssetsActivity : AppCompatActivity() {
             longToast(getString(R.string.connect_to_internet))
             return
         }
-        ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
-        ethereumViewModel.getGasConfig()
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "Ethereum").toString()
+        network = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet").toString()
+        publicAddress = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PUBLICKEY, "").toString()
+        sessionID = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(SESSION_ID, "").toString()
+        priceInUSD = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PRICE_IN_USD, "").toString()
+        if(blockChain == getString(R.string.ethereum)) {
+            ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
+            ethereumViewModel.getGasConfig()
+            configureWeb3j()
+        } else {
+            solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
+        }
         setUpListeners()
-        configureWeb3j()
     }
 
     private fun setUpListeners() {
@@ -84,11 +95,6 @@ class TransferAssetsActivity : AppCompatActivity() {
         flTransaction = findViewById(R.id.flTransaction)
         val etBlockChain = findViewById<AppCompatEditText>(R.id.etBlockChain)
         val etBlockChainAdd = findViewById<AppCompatEditText>(R.id.etBlockChainAdd)
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "Ethereum").toString()
-        network = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet").toString()
-        publicAddress = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PUBLICKEY, "").toString()
-        sessionID = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(SESSION_ID, "").toString()
-        priceInUSD = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PRICE_IN_USD, "").toString()
 
         etBlockChainAdd.setText(blockChain.let { Web3AuthUtils.getBlockChainName(it) })
         etBlockChain.setText(blockChain)
@@ -103,29 +109,44 @@ class TransferAssetsActivity : AppCompatActivity() {
         findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressed() }
         findViewById<AppCompatImageView>(R.id.ivScan).setOnClickListener { scanQRCode() }
 
+        resetTotalCost()
+
         tvEth.setOnClickListener {
             it.background = getDrawable(R.drawable.bg_layout_tv_blue)
             tvUSD.background = getDrawable(R.drawable.bg_layout_tv_grey)
-            isEthSelected = true
+            isUSDSelected = false
+            etAmountToSend.text?.clear()
+            resetTotalCost()
         }
 
         tvUSD.setOnClickListener {
             it.background = getDrawable(R.drawable.bg_layout_tv_blue)
             tvEth.background = getDrawable(R.drawable.bg_layout_tv_grey)
-            isEthSelected = false
-            if(etAmountToSend.text.toString().isNotEmpty()) {
-                val ethAmount = Web3AuthUtils.getPriceInEth(etAmountToSend.text.toString().toDouble(), priceInUSD.toDouble())
-                totalCostinETH = ethAmount.plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
-                setTotalAmount()
-            }
+            isUSDSelected = true
+            etAmountToSend.text?.clear()
+            resetTotalCost()
         }
+
 
         etAmountToSend.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if(s?.isNotEmpty() == true) {
-                    totalCostinETH = s.toString().toDouble()
-                        .plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
-                    setTotalAmount()
+                    if(blockChain == getString(R.string.ethereum)) {
+                        totalCostinETH = if(isUSDSelected) {
+                            Web3AuthUtils.getPriceInEth(s.toString().toDouble(), priceInUSD.toDouble())
+                                .plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
+                        } else {
+                            s.toString().toDouble().plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
+                        }
+                        setTotalAmount()
+                    } else {
+                        totalAmountInSol = if(isUSDSelected) {
+                            Web3AuthUtils.getPriceInSol(s.toString().toDouble(), priceInUSD.toDouble())
+                        } else {
+                            s.toString().toDouble()
+                        }
+                        setTotalAmountForSol()
+                    }
                 }
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -133,15 +154,28 @@ class TransferAssetsActivity : AppCompatActivity() {
         })
 
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
-            if (isValidDetails()) {
-                showConfirmTransactionDialog(
-                    publicAddress,
-                    etRecipientAddress.text.toString(),
-                    etAmountToSend.text.toString(),
-                    gasFee, processTime,
-                    tvTotalAmount.text.toString(),
-                    tvCostInETH.text.toString()
-                )
+            if(blockChain == getString(R.string.ethereum)) {
+                if (isValidDetails()) {
+                    showConfirmTransactionDialog(
+                        publicAddress,
+                        etRecipientAddress.text.toString(),
+                        etAmountToSend.text.toString(),
+                        gasFee, processTime,
+                        tvTotalAmount.text.toString(),
+                        tvCostInETH.text.toString()
+                    )
+                }
+            } else {
+                if(isValidSolanaDetails()) {
+                    showConfirmTransactionDialog(
+                        publicAddress,
+                        etRecipientAddress.text.toString(),
+                        etAmountToSend.text.toString(),
+                        gasFee = 0.0000005, processTime = 0.50,
+                        tvTotalAmount.text.toString(),
+                        tvCostInETH.text.toString()
+                    )
+                }
             }
         }
 
@@ -149,31 +183,29 @@ class TransferAssetsActivity : AppCompatActivity() {
             showMaxTransactionSelectDialog()
         }
 
-        ethereumViewModel.ethGasAPIResponse.observe(this) {
-            if(it != null) {
-                ethGasAPIResponse = it
-                setMaxTransFee(it.fastest)
-                gasFee = it.fastest
-                processTime = it.fastestWait
+        if(blockChain == getString(R.string.ethereum)) {
+            ethereumViewModel.ethGasAPIResponse.observe(this) {
+                if (it != null) {
+                    ethGasAPIResponse = it
+                    //setMaxTransFee(it.fastest)
+                    gasFee = it.fastest
+                    processTime = it.fastestWait
+                }
             }
-        }
 
-        ethereumViewModel.transactionHash.observe(this) {
-            if(it.second.isNullOrEmpty()) return@observe
-            if(::transDialog.isInitialized) {
-                transDialog.dismiss()
+            ethereumViewModel.transactionHash.observe(this) {
+                observeTransactionResult(it)
             }
-            if(it.first) {
-                showTransactionDialog(TransactionStatus.SUCCESSFUL)
-            } else {
-                showTransactionDialog(TransactionStatus.FAILED)
-            }
-        }
 
-        ethereumViewModel.gasAPIResponse.observe(this) {
-            if(it != null) {
-                gasApiResponse = it
-                it.high?.let { it1 -> setGasParams(it1) }
+            ethereumViewModel.gasAPIResponse.observe(this) {
+                if (it != null) {
+                    gasApiResponse = it
+                    it.high?.let { it1 -> setGasParams(it1) }
+                }
+            }
+        } else {
+            solanaViewModel.sendTransactionResult.observe(this) {
+                observeTransactionResult(it)
             }
         }
     }
@@ -195,6 +227,16 @@ class TransferAssetsActivity : AppCompatActivity() {
         barcodeLauncher.launch(ScanOptions())
     }
 
+    private fun observeTransactionResult(result: Pair<Boolean, String>) {
+        if (result.second.isNullOrEmpty()) return
+        if(::transDialog.isInitialized) transDialog.dismiss()
+        if (result.first) {
+            showTransactionDialog(TransactionStatus.SUCCESSFUL)
+        } else {
+            showTransactionDialog(TransactionStatus.FAILED)
+        }
+    }
+
     private val barcodeLauncher = registerForActivityResult(
         ScanContract()
     ) { result: ScanIntentResult ->
@@ -214,12 +256,29 @@ class TransferAssetsActivity : AppCompatActivity() {
         }
     }
 
+    private fun resetTotalCost() {
+        tvTotalAmount.text = "0".plus(" " + Web3AuthUtils.getCurrency(blockChain))
+        tvCostInETH.text = "= ".plus("0").plus(" ").plus(getString(R.string.usd))
+    }
+
     private fun isValidDetails(): Boolean {
         return if(etRecipientAddress.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_address))
             false
         } else if (!Web3AuthUtils.isValidEthAddress(etRecipientAddress.text.toString().trim())) {
-            toast(getString(R.string.correct_address))
+            toast(getString(R.string.invalid_address))
+            false
+        } else if(etAmountToSend.text?.isNullOrEmpty() == true) {
+            toast(getString(R.string.enter_amt_to_transfer))
+            false
+        } else {
+            true
+        }
+    }
+
+    private fun isValidSolanaDetails(): Boolean {
+        return if(etRecipientAddress.text?.isNullOrEmpty() == true) {
+            toast(getString(R.string.enter_address))
             false
         } else if(etAmountToSend.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_amt_to_transfer))
@@ -313,7 +372,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun showConfirmTransactionDialog(senderAdd: String, receiptAdd: String, amountToBeSent: String,
-        gasFee: Double, processTime: Double, totalAmountInEth: String, totalAmountInUSD: String
+        gasFee: Double, processTime: Double, totalAmount: String, totalAmountInUSD: String
     ) {
         transDialog = Dialog(this@TransferAssetsActivity)
         transDialog.setContentView(R.layout.dialog_confirm_transaction)
@@ -344,24 +403,35 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvAmountInUsd.text = "~".plus(String.format("%.6f", Web3AuthUtils.getPriceinUSD(amountToBeSent.toDouble(), priceInUSD.toDouble())))
             .plus(" ").plus(getString(R.string.usd))
         tvNetwork.text = blockChain.plus(" ").plus(network)
-        tvTransactionValue.text = Web3AuthUtils.getMaxTransactionFee(gasFee).toString()
-            .plus(" " + Web3AuthUtils.getCurrency(blockChain))
+
+        if(blockChain == getString(R.string.ethereum))
+            tvTransactionValue.text = Web3AuthUtils.getMaxTransactionFee(gasFee).toString()
+                .plus(" " + Web3AuthUtils.getCurrency(blockChain))
+        else
+            tvTransactionValue.text = "0.000005".plus(" " + Web3AuthUtils.getCurrency(blockChain))
+
         tvProcessTime.text = "in".plus(" ").plus(" ")
             .plus(Web3AuthUtils.convertMinsToSec(processTime)).plus(" ").plus(getString(R.string.seconds))
 
-        tvTotalAmountInETH.text = totalAmountInEth
-        tvTotalCostInUSD.text = totalAmountInUSD
+        tvTotalAmountInETH.text = totalAmount
+        tvTotalCostInUSD.text = totalAmountInUSD.replace("=", "~")
 
         btnConfirm.setOnClickListener {
             clTransaction.hide()
             clProgressBar.show()
-            ethereumViewModel.sendTransaction(
-                sessionID,
-                receiptAdd,
-                totalAmountInEth.split(" ")[0].toDouble(),
-                intent.getStringExtra(DATA),
-                selectedGasParams
-            )
+            if (blockChain == getString(R.string.ethereum)) {
+                ethereumViewModel.sendTransaction(
+                    sessionID,
+                    receiptAdd,
+                    totalAmount.split(" ")[0].toDouble(),
+                    intent.getStringExtra(DATA),
+                    selectedGasParams
+                )
+            } else {
+                println("SOL Amount: " + Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]))
+                solanaViewModel.signAndSendTransaction(receiptAdd,
+                    amount = Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]))
+            }
         }
         tvCancel.setOnClickListener {
             transDialog.dismiss()
@@ -371,19 +441,32 @@ class TransferAssetsActivity : AppCompatActivity() {
 
     private fun setMaxTransFee(fee: Double) {
         etMaxTransFee.setText(getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(fee)))
-        totalCostinETH = if(etAmountToSend.text?.isNotEmpty() == true) {
-            etAmountToSend.text.toString().toDouble()
-                .plus(Web3AuthUtils.getMaxTransactionFee(fee))
-        } else {
-            Web3AuthUtils.getMaxTransactionFee(fee)
+        var amount = etAmountToSend.text.toString()
+        if(amount.isNotEmpty()) {
+            totalCostinETH = if (isUSDSelected) {
+                Web3AuthUtils.getPriceInEth(
+                    amount.toDouble(),
+                    priceInUSD.toDouble()
+                ).plus(Web3AuthUtils.getMaxTransactionFee(fee))
+            } else {
+                amount.toString().toDouble()
+                    .plus(Web3AuthUtils.getMaxTransactionFee(fee))
+            }
+            setTotalAmount()
         }
-        setTotalAmount()
     }
 
     private fun setTotalAmount() {
         tvTotalAmount.text =
             String.format("%.6f", totalCostinETH).plus(" " + Web3AuthUtils.getCurrency(blockChain))
         tvCostInETH.text = "= ".plus(String.format("%.6f", Web3AuthUtils.getPriceinUSD(totalCostinETH, priceInUSD.toDouble())))
+            .plus(" ").plus(getString(R.string.usd))
+    }
+
+    private fun setTotalAmountForSol() {
+        tvTotalAmount.text =
+            String.format("%.4f", totalAmountInSol).plus(" " + Web3AuthUtils.getCurrency(blockChain))
+        tvCostInETH.text = "= ".plus(String.format("%.4f", Web3AuthUtils.getPriceinUSD(totalAmountInSol, priceInUSD.toDouble())))
             .plus(" ").plus(getString(R.string.usd))
     }
 
@@ -411,8 +494,9 @@ class TransferAssetsActivity : AppCompatActivity() {
             TransactionStatus.SUCCESSFUL -> {
                 transactionState.text = getString(R.string.transaction_success)
                 ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
+                tvStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
                 tvStatus.setOnClickListener {
-                    Web3AuthUtils.openCustomTabs(this@TransferAssetsActivity,"https://mumbai.polygonscan.com/")
+                    Web3AuthUtils.openCustomTabs(this@TransferAssetsActivity, Web3AuthUtils.getViewTransactionUrl(this, blockChain))
                 }
             }
             TransactionStatus.FAILED -> {

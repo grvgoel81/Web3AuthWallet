@@ -12,19 +12,21 @@ import com.paymennt.solanaj.wallet.SolanaWallet
 
 object SolanaManager {
 
-    private lateinit var solanaWallet: SolanaWallet
+    lateinit var solanaWallet: SolanaWallet
 
-    fun createWallet(network: Network, message: String? = null, passphrase: String? = null) {
-        val network = Network.TESTNET
+    fun createWallet(network: Network,
+                     message: String? = "swing brown giraffe enter common awful rent shock mobile wisdom increase banana",
+                     passphrase: String? = null): String? {
+        //val network = Network.TESTNET
 
         // create wallet
         solanaWallet = SolanaWallet(message, passphrase, network)
 
-        // get address (account, chain, index), used to receive
-        solanaWallet.getAddress(0, AbstractWallet.Chain.EXTERNAL, null)
-
         // get private key (account, chain, index), used to sign transactions
         solanaWallet.getPrivateKey(0, AbstractWallet.Chain.EXTERNAL, null)
+
+        // get address (account, chain, index), used to receive
+        return solanaWallet.getAddress(0, AbstractWallet.Chain.EXTERNAL, null)
     }
 
     fun getBalance(publicAddress: String): Long {

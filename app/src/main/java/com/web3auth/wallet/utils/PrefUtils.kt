@@ -7,6 +7,9 @@ import android.widget.Toast
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
+import java.math.BigDecimal
+import java.math.RoundingMode
+import kotlin.math.pow
 
 private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 val Context.web3AuthWalletPreferences: SharedPreferences
@@ -77,6 +80,8 @@ fun View.show() {
 }
 
 fun Double.roundOff(): String = String.format("%.4f", this)
+
+fun Long.roundOffLong(): BigDecimal = BigDecimal(this.div(10.0.pow(9))).setScale(2, RoundingMode.HALF_UP)
 
 fun View.hide() {
     this.visibility = View.GONE

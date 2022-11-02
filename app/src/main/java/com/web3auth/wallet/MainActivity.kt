@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectedNetwork: String
     private lateinit var tvExchangeRate: AppCompatTextView
     private lateinit var tvPriceInUSD: AppCompatTextView
+    private lateinit var tvViewTransactionStatus: AppCompatTextView
     private var priceInUSD: String = ""
     private lateinit var etMessage: AppCompatEditText
     private lateinit var btnSign: AppCompatButton
@@ -163,8 +164,12 @@ class MainActivity : AppCompatActivity() {
                 publicAddress = it
                 findViewById<AppCompatTextView>(R.id.tvAddress).text =
                     publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
+                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
                 solanaViewModel.getBalance(publicAddress)
             }
+        }
+        solanaViewModel.privateKey.observe(this) {
+            println("Private Key: $it")
         }
         solanaViewModel.balance.observe(this) {
             if(it > 0) {
@@ -217,14 +222,13 @@ class MainActivity : AppCompatActivity() {
     private fun setData() {
         findViewById<AppCompatTextView>(R.id.tvNetwork).text =
             blockChain.plus(" ").plus(selectedNetwork)
-
         findViewById<AppCompatTextView>(R.id.spBlockChain).text = Web3AuthUtils.getCurrency(blockChain)
 
-        findViewById<AppCompatTextView>(R.id.tvViewTransactionStatus).setOnClickListener {
-            Web3AuthUtils.openCustomTabs(this@MainActivity,"https://mumbai.polygonscan.com/")
+        tvViewTransactionStatus = findViewById(R.id.tvViewTransactionStatus)
+        tvViewTransactionStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
+        tvViewTransactionStatus.setOnClickListener {
+            Web3AuthUtils.openCustomTabs(this@MainActivity, Web3AuthUtils.getViewTransactionUrl(this, blockChain))
         }
-
-
 
         if(blockChain == getString(R.string.solana)) {
             SolanaManager.createWallet(NetworkUtils.getSolanaNetwork(selectedNetwork))
@@ -313,7 +317,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        ethereumViewModel.retrieveBalance(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(PUBLICKEY, "").toString())
+        if(blockChain == getString(R.string.ethereum)) {
+            ethereumViewModel.retrieveBalance(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(PUBLICKEY, "")
+                .toString()
+            )
+        } else {
+            solanaViewModel.getBalance(publicAddress)
+        }
     }
 
     private fun logout() {

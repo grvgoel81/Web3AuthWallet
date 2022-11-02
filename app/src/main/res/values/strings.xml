@@ -30,7 +30,10 @@
     <string name="transaction_success">Transaction Success</string>
     <string name="transaction_pending">Transaction Pending</string>
     <string name="try_again">Try again now</string>
-    <string name="view_transaction_status"><u>View transaction’s status on Etherscan</u></string>
+    <string name="eth_view_transaction_status"><u>View transaction’s status on Etherscan</u></string>
+    <string name="sol_view_transaction_status"><u>View transaction’s status on Solana Explorer</u></string>
+    <string name="eth_transaction_status_url">https://mumbai.polygonscan.com/</string>
+    <string name="sol_transaction_status_url">https://explorer.solana.com/</string>
     <string name="sign_failed">Sign Failed</string>
     <string name="sign_success">Sign Successfully</string>
     <string name="copy"><u>Copy</u></string>
@@ -55,7 +58,7 @@
     <string name="connect_to_internet">Internet Connection not available.</string>
     <string name="enter_amt_to_transfer">Enter amount to transfer</string>
     <string name="enter_address">Enter Address</string>
-    <string name="correct_address">Enter correct address</string>
+    <string name="invalid_address">Invalid address</string>
     <string name="web3auth_project_id">BASdZxp5tWqPGkzbOU4VMJsnz8QOpJ2pyxf6kZcuxI8AJ1gsOw5MgbW96RpAAx_Kk-5p4rhOopPhCa9kR_9mKpE</string>
     <string name="ethereum">Ethereum</string>
     <string name="solana">Solana</string>

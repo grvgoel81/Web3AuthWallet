@@ -1,12 +1,14 @@
 package com.web3auth.wallet.utils
 
 import android.content.Context
+import android.icu.util.CurrencyAmount
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import com.web3auth.core.getCustomTabsBrowsers
 import com.web3auth.core.getDefaultBrowser
+import com.web3auth.wallet.R
 import org.web3j.crypto.ECKeyPair
 import org.web3j.protocol.core.methods.response.EthGetBalance
 import java.math.BigDecimal
@@ -51,7 +53,23 @@ object Web3AuthUtils {
         return false
     }
 
-    fun getEtherInWei() = 10.0.pow(18)
+    fun getTransactionStatusText(context: Context, blockChain: String): String {
+        return when(blockChain) {
+            "Ethereum" -> context.getString(R.string.eth_view_transaction_status)
+            "Solana" -> context.getString(R.string.sol_view_transaction_status)
+            else -> context.getString(R.string.eth_view_transaction_status)
+        }
+    }
+
+    fun getViewTransactionUrl(context: Context, blockChain: String): String {
+        return when(blockChain) {
+            "Ethereum" -> context.getString(R.string.eth_transaction_status_url)
+            "Solana" -> context.getString(R.string.sol_transaction_status_url)
+            else -> context.getString(R.string.eth_transaction_status_url)
+        }
+    }
+
+    private fun getEtherInWei() = 10.0.pow(18)
 
     private fun getEtherInGwei() = 10.0.pow(10)
 
@@ -82,8 +100,11 @@ object Web3AuthUtils {
 
     fun convertMinsToSec(mins: Double): Double = mins * 60L
 
-    fun getMaxTransactionFee(amount: Double): Double =
-        toGwieEther(BigDecimal.valueOf(amount).multiply(BigDecimal.valueOf(21000)))
+    fun getMaxTransactionFee(amount: Double): Double {
+        return toGwieEther(BigDecimal.valueOf(amount).multiply(BigDecimal.valueOf(21000)))
+    }
+
+    fun getAmountInLamports(amount: String) = amount.toBigDecimal().multiply(BigDecimal.valueOf(1000000000)).toLong()
 
     fun containsEmoji(message: String): Boolean {
         val emojiRegex = Regex(pattern = "(?:[\uD83C\uDF00-\uD83D\uDDFF]|[\uD83E\uDD00-\uD83E\uDDFF]|" +
@@ -106,6 +127,8 @@ object Web3AuthUtils {
     fun getPriceinUSD(ethAmount: Double, usdPrice: Double): Double = ethAmount * (usdPrice)
 
     fun getPriceInEth(amount: Double, usdPrice: Double) = amount/usdPrice
+
+    fun getPriceInSol(amount: Double, usdPrice: Double) = amount/usdPrice
 
     fun openCustomTabs(context: Context, url: String) {
         val defaultBrowser = context.getDefaultBrowser()

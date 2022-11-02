@@ -208,7 +208,7 @@
                 android:layout_marginTop="18dp"
                 android:gravity="center_horizontal"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="@string/view_transaction_status"
+                android:text="@string/eth_view_transaction_status"
                 android:textColor="@color/purple_500"
                 android:textSize="14sp" />
 

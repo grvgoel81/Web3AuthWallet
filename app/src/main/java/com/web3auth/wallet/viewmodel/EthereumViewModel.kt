@@ -32,7 +32,7 @@ class EthereumViewModel : ViewModel() {
     var publicAddress = MutableLiveData("")
     var balance = MutableLiveData(0.0)
     var ethGasAPIResponse: MutableLiveData<EthGasAPIResponse> = MutableLiveData(null)
-    var transactionHash: MutableLiveData<Pair<Boolean, String>> = MutableLiveData(Pair(false, ""))
+    var transactionHash = MutableLiveData(Pair(false, ""))
     var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
 
     init {
@@ -126,6 +126,7 @@ class EthereumViewModel : ViewModel() {
                 val value: BigInteger =
                     Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
                 val gasLimit: BigInteger = BigInteger.valueOf(21000)
+                val gasFee = web3.ethGasPrice().send().gasPrice
 
                 val rawTransaction: RawTransaction = RawTransaction.createTransaction(
                     80001,
@@ -134,8 +135,8 @@ class EthereumViewModel : ViewModel() {
                     recipientAddress,
                     value,
                     data ?: "",
-                    BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 7),
-                    BigInteger.valueOf(params.suggestedMaxFeePerGas?.toLong() ?: 70)
+                    /*BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 4)*/gasFee,
+                    /*BigInteger.valueOf(params.suggestedMaxFeePerGas?.toLong() ?: 67)*/gasFee
                 )
                 // Sign the transaction
                 val signedMessage: ByteArray =
