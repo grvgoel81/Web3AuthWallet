@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
@@ -45,6 +47,8 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var tvUSD: AppCompatTextView
     private lateinit var tvTotalAmount: AppCompatTextView
     private lateinit var tvCostInETH: AppCompatTextView
+    private lateinit var flTransaction: FrameLayout
+    private lateinit var tvEdit: AppCompatTextView
     private lateinit var sessionID: String
     private lateinit var priceInUSD: String
     private lateinit var transDialog: Dialog
@@ -76,16 +80,25 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvUSD = findViewById(R.id.tvUSD)
         tvTotalAmount = findViewById(R.id.tvTotalAmount)
         tvCostInETH = findViewById(R.id.tvCostInETH)
+        tvEdit = findViewById(R.id.tvEditTransFee)
+        flTransaction = findViewById(R.id.flTransaction)
         val etBlockChain = findViewById<AppCompatEditText>(R.id.etBlockChain)
         val etBlockChainAdd = findViewById<AppCompatEditText>(R.id.etBlockChainAdd)
-        blockChain = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(BLOCKCHAIN, "Ethereum").toString()
-        network = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(NETWORK, "Mainnet").toString()
-        publicAddress = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PUBLICKEY, "").toString()
-        sessionID = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(SESSION_ID, "").toString()
-        priceInUSD = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.getString(PRICE_IN_USD, "").toString()
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "Ethereum").toString()
+        network = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet").toString()
+        publicAddress = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PUBLICKEY, "").toString()
+        sessionID = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(SESSION_ID, "").toString()
+        priceInUSD = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PRICE_IN_USD, "").toString()
 
         etBlockChainAdd.setText(blockChain.let { Web3AuthUtils.getBlockChainName(it) })
         etBlockChain.setText(blockChain)
+
+        if(blockChain == getString(R.string.solana)) {
+            findViewById<AppCompatTextView>(R.id.tvTransactionFee).hide()
+            tvEdit.hide()
+            flTransaction.hide()
+            tvEth.text = Web3AuthUtils.getCurrency(blockChain)
+        }
 
         findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressed() }
         findViewById<AppCompatImageView>(R.id.ivScan).setOnClickListener { scanQRCode() }
@@ -132,7 +145,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<AppCompatTextView>(R.id.tvEditTransFee).setOnClickListener {
+        tvEdit.setOnClickListener {
             showMaxTransactionSelectDialog()
         }
 
@@ -146,11 +159,11 @@ class TransferAssetsActivity : AppCompatActivity() {
         }
 
         ethereumViewModel.transactionHash.observe(this) {
-            if(it.isNullOrEmpty()) return@observe
+            if(it.second.isNullOrEmpty()) return@observe
             if(::transDialog.isInitialized) {
                 transDialog.dismiss()
             }
-            if(it.isNotEmpty()) {
+            if(it.first) {
                 showTransactionDialog(TransactionStatus.SUCCESSFUL)
             } else {
                 showTransactionDialog(TransactionStatus.FAILED)

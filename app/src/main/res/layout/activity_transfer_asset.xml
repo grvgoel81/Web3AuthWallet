@@ -204,9 +204,15 @@
                 android:background="@drawable/bg_layout_tv_grey"
                 android:text="USD"
                 android:textColor="#6F717A" />
-
-
         </FrameLayout>
+
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_tags=""
+            android:visibility="gone"
+            app:constraint_referenced_ids="tvTransactionFee, tvEditTransFee, flTransaction"
+            android:id="@+id/max_trans_group" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvTransactionFee"

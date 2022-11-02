@@ -21,6 +21,7 @@ import org.web3j.utils.Convert
 import org.web3j.utils.Numeric
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
+import kotlin.Pair
 
 class EthereumViewModel : ViewModel() {
 
@@ -31,7 +32,7 @@ class EthereumViewModel : ViewModel() {
     var publicAddress = MutableLiveData("")
     var balance = MutableLiveData(0.0)
     var ethGasAPIResponse: MutableLiveData<EthGasAPIResponse> = MutableLiveData(null)
-    var transactionHash = MutableLiveData("")
+    var transactionHash: MutableLiveData<Pair<Boolean, String>> = MutableLiveData(Pair(false, ""))
     var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
 
     init {
@@ -59,7 +60,6 @@ class EthereumViewModel : ViewModel() {
                 priceInUSD.postValue(result.body()?.USD)
             }
         }
-
     }
 
     fun getPublicAddress(sessionId: String) {
@@ -141,9 +141,12 @@ class EthereumViewModel : ViewModel() {
                 val signedMessage: ByteArray =
                     TransactionEncoder.signMessage(rawTransaction, credentials)
                 val hexValue: String = Numeric.toHexString(signedMessage)
-                val ethSendTransaction: EthSendTransaction =
-                    web3.ethSendRawTransaction(hexValue).send()
-                transactionHash.postValue(ethSendTransaction.transactionHash)
+                val ethSendTransaction: EthSendTransaction = web3.ethSendRawTransaction(hexValue).send()
+                if(ethSendTransaction.error != null) {
+                    transactionHash.postValue(Pair(false, ethSendTransaction.error.message))
+                } else {
+                    transactionHash.postValue(Pair(true, ethSendTransaction.transactionHash))
+                }
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
