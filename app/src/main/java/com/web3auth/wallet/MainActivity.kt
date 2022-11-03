@@ -113,73 +113,77 @@ class MainActivity : AppCompatActivity() {
         setData()
     }
 
-    private fun observeListeners() = if (blockChain == getString(R.string.ethereum)) {
-        ethereumViewModel.isWeb3Configured.observe(this) {
-            if (it == false) {
-                toast("Error connecting to Web3j")
+    private fun observeListeners() {
+        if (blockChain == getString(R.string.ethereum)) {
+            ethereumViewModel.isWeb3Configured.observe(this) {
+                if (it == false) {
+                    toast("Error connecting to Web3j")
+                }
             }
-        }
 
-        ethereumViewModel.priceInUSD.observe(this) {
-            if (!it.isNullOrEmpty()) {
-                priceInUSD = it
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
-                tvExchangeRate.text =
-                    "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
-                        .plus(priceInUSD).plus(" " + getString(R.string.usd))
-                ethereumViewModel.retrieveBalance(publicAddress)
+            ethereumViewModel.priceInUSD.observe(this) {
+                if (!it.isNullOrEmpty()) {
+                    priceInUSD = it
+                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
+                    tvExchangeRate.text =
+                        "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
+                            .plus(priceInUSD).plus(" " + getString(R.string.usd))
+                    if (publicAddress.isNotEmpty()) {
+                        ethereumViewModel.retrieveBalance(publicAddress)
+                    }
+                }
             }
-        }
 
-        ethereumViewModel.publicAddress.observe(this) {
-            publicAddress = it
-            findViewById<AppCompatTextView>(R.id.tvAddress).text =
-                publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
-            if (publicAddress.isNotEmpty()) {
-                ethereumViewModel.retrieveBalance(publicAddress)
-            }
-        }
-
-        ethereumViewModel.balance.observe(this) {
-            if (it > 0.0 && priceInUSD.isNotEmpty()) {
-                tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
-                val usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
-                tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
-                progressDialog.dismiss()
-            }
-        }
-    } else {
-        solanaViewModel.priceInUSD.observe(this){
-            if (!it.isNullOrEmpty()) {
-                priceInUSD = it
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
-                tvExchangeRate.text =
-                    "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
-                        .plus(priceInUSD).plus(" " + getString(R.string.usd))
-            }
-        }
-        solanaViewModel.publicAddress.observe(this) {
-            if(it.isNotEmpty()) {
+            ethereumViewModel.publicAddress.observe(this) {
                 publicAddress = it
                 findViewById<AppCompatTextView>(R.id.tvAddress).text =
                     publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
                 Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
-                solanaViewModel.getBalance(publicAddress)
+                if (publicAddress.isNotEmpty()) {
+                    ethereumViewModel.retrieveBalance(publicAddress)
+                }
             }
-        }
-        solanaViewModel.privateKey.observe(this) {
-            println("Private Key: $it")
-        }
-        solanaViewModel.balance.observe(this) {
-            if(it > 0) {
-                tvBalance.text = String.format("%.4f", it.roundOffLong())
-                progressDialog.dismiss()
-            }
-        }
 
-        solanaViewModel
+            ethereumViewModel.balance.observe(this) { it ->
+                progressDialog.dismiss()
+                if (it > 0.0 && priceInUSD.isNotEmpty()) {
+                    tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
+                    val usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
+                    tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
+                }
+            }
+
+        } else {
+            solanaViewModel.priceInUSD.observe(this){
+                if (!it.isNullOrEmpty()) {
+                    priceInUSD = it
+                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
+                    tvExchangeRate.text =
+                        "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
+                            .plus(priceInUSD).plus(" " + getString(R.string.usd))
+                }
+            }
+            solanaViewModel.publicAddress.observe(this) {
+                if(it.isNotEmpty()) {
+                    publicAddress = it
+                    findViewById<AppCompatTextView>(R.id.tvAddress).text =
+                        publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
+                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
+                    solanaViewModel.getBalance(publicAddress)
+                }
+            }
+            solanaViewModel.privateKey.observe(this) {
+                println("Private Key: $it")
+            }
+            solanaViewModel.balance.observe(this) {
+                if(it > 0) {
+                    tvBalance.text = String.format("%.4f", it.roundOffLong())
+                    progressDialog.dismiss()
+                }
+            }
+        }
     }
+
 
     private fun setUpListeners() {
         tvExchangeRate = findViewById(R.id.tvExchangeRate)

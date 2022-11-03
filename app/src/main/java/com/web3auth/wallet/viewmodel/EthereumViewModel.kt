@@ -71,10 +71,14 @@ class EthereumViewModel : ViewModel() {
 
     fun retrieveBalance(publicAddress: String) {
         GlobalScope.launch {
-            web3Balance = web3.ethGetBalance(publicAddress, DefaultBlockParameterName.LATEST)
-                .sendAsync()
-                .get()
-            balance.postValue(web3Balance.balance.toDouble())
+            try {
+                web3Balance = web3.ethGetBalance(publicAddress, DefaultBlockParameterName.LATEST)
+                    .sendAsync()
+                    .get()
+                balance.postValue(web3Balance.balance.toDouble())
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
         }
     }
 
@@ -135,8 +139,8 @@ class EthereumViewModel : ViewModel() {
                     recipientAddress,
                     value,
                     data ?: "",
-                    /*BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 4)*/gasFee,
-                    /*BigInteger.valueOf(params.suggestedMaxFeePerGas?.toLong() ?: 67)*/gasFee
+                    BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 4),
+                    BigInteger.valueOf(params.suggestedMaxFeePerGas?.toLong() ?: 67)
                 )
                 // Sign the transaction
                 val signedMessage: ByteArray =

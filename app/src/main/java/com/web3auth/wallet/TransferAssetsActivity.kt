@@ -326,7 +326,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         tvSlowEth.text = getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.average))
             .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
 
-        rbFast.setOnClickListener {
+        clFast.setOnClickListener {
             rbAvg.isChecked = false
             rbSlow.isChecked = false
             gasFee = ethGasAPIResponse.fastest
@@ -336,7 +336,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        rbAvg.setOnClickListener {
+        clAvg.setOnClickListener {
             rbFast.isChecked = false
             rbSlow.isChecked = false
             gasFee = ethGasAPIResponse.fast
@@ -346,7 +346,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        rbSlow.setOnClickListener {
+        clSlow.setOnClickListener {
             rbAvg.isChecked = false
             rbFast.isChecked = false
             gasFee = ethGasAPIResponse.average
@@ -424,11 +424,10 @@ class TransferAssetsActivity : AppCompatActivity() {
                     sessionID,
                     receiptAdd,
                     totalAmount.split(" ")[0].toDouble(),
-                    intent.getStringExtra(DATA),
+                    "",
                     selectedGasParams
                 )
             } else {
-                println("SOL Amount: " + Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]))
                 solanaViewModel.signAndSendTransaction(receiptAdd,
                     amount = Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]))
             }
