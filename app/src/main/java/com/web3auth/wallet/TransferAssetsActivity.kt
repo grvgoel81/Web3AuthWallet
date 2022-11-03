@@ -231,6 +231,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         if (result.second.isNullOrEmpty()) return
         if(::transDialog.isInitialized) transDialog.dismiss()
         if (result.first) {
+            println("transaction: ${result.second}")
             showTransactionDialog(TransactionStatus.SUCCESSFUL)
         } else {
             showTransactionDialog(TransactionStatus.FAILED)
@@ -428,8 +429,10 @@ class TransferAssetsActivity : AppCompatActivity() {
                     selectedGasParams
                 )
             } else {
-                solanaViewModel.signAndSendTransaction(receiptAdd,
-                    amount = Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]))
+                var ed25519key = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "").toString()
+                solanaViewModel.signAndSendTransaction(NetworkUtils.getSolanaNetwork(blockChain), ed25519key, publicAddress, receiptAdd,
+                    amount = Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]),
+                    /*intent.getStringExtra(DATA)*/"hello")
             }
         }
         tvCancel.setOnClickListener {
@@ -440,7 +443,7 @@ class TransferAssetsActivity : AppCompatActivity() {
 
     private fun setMaxTransFee(fee: Double) {
         etMaxTransFee.setText(getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(fee)))
-        var amount = etAmountToSend.text.toString()
+        val amount = etAmountToSend.text.toString()
         if(amount.isNotEmpty()) {
             totalCostinETH = if (isUSDSelected) {
                 Web3AuthUtils.getPriceInEth(

@@ -10,24 +10,26 @@ import com.paymennt.solanaj.data.SolanaTransaction
 import com.paymennt.solanaj.program.SystemProgram
 import com.paymennt.solanaj.wallet.SolanaWallet
 
+
 object SolanaManager {
 
     lateinit var solanaWallet: SolanaWallet
 
-    fun createWallet(network: Network,
+    fun createWallet(network: Network = Network.TESTNET,
                      message: String? = "swing brown giraffe enter common awful rent shock mobile wisdom increase banana",
-                     passphrase: String? = null): String? {
+                     passphrase: String? = null, data: String?) {
         //val network = Network.TESTNET
 
         // create wallet
-        solanaWallet = SolanaWallet(message, passphrase, network)
+        //solanaWallet = SolanaWallet(message, passphrase, network)
 
         // get private key (account, chain, index), used to sign transactions
-        solanaWallet.getPrivateKey(0, AbstractWallet.Chain.EXTERNAL, null)
+        //solanaWallet.getPrivateKey(0, AbstractWallet.Chain.EXTERNAL, null)
 
         // get address (account, chain, index), used to receive
-        return solanaWallet.getAddress(0, AbstractWallet.Chain.EXTERNAL, null)
+        //return solanaWallet.getAddress(0, AbstractWallet.Chain.EXTERNAL, null)
     }
+
 
     fun getBalance(publicAddress: String): Long {
         val client = SolanaRpcClient(Cluster.DEVNET)

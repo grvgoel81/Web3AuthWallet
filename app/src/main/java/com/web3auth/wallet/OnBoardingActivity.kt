@@ -104,9 +104,11 @@ class OnBoardingActivity: AppCompatActivity() {
         loginCompletableFuture.whenComplete { loginResponse, error ->
             if (error == null) {
                 Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGIN_RESPONSE] = loginResponse
+                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ED25519Key] = loginResponse.ed25519PrivKey.toString()
                 Web3AuthWalletApp.getContext().web3AuthWalletPreferences[SESSION_ID] = loginResponse.sessionId.toString()
-                startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
                 Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = true
+                startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
+                finish()
             } else {
                 Log.d("OnBoardingError", error.message ?: "Something went wrong" )
             }

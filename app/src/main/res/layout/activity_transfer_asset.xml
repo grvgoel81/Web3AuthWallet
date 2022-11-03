@@ -182,6 +182,7 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_edit_text"
                 android:hint="0.00"
+                android:inputType="numberDecimal"
                 android:paddingLeft="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvSendTo" />

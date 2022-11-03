@@ -144,4 +144,16 @@ object Web3AuthUtils {
             customTabs.launchUrl(context, Uri.parse(url))
         }
     }
+
+    /**
+     * convert byte array to hex string
+     */
+    fun convertByteToHexadecimal(byteArray: ByteArray): String {
+        var hex = ""
+        // Iterating through each byte in the array
+        for (i in byteArray) {
+            hex += String.format("%02X", i)
+        }
+        return hex.lowercase(Locale.ROOT)
+    }
 }
