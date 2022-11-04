@@ -1,7 +1,7 @@
 package com.web3auth.wallet.utils
 
-import com.guness.ksolana.rpc.Cluster
 import com.web3auth.core.Web3Auth
+import org.p2p.solanaj.rpc.Cluster
 import org.torusresearch.fetchnodedetails.types.TorusNetwork
 
 object NetworkUtils {
@@ -18,7 +18,7 @@ object NetworkUtils {
         return when(network) {
             "Mainnet" -> TorusNetwork.MAINNET
             "Testnet" -> TorusNetwork.TESTNET
-            else  -> TorusNetwork.CYAN
+            else  -> TorusNetwork.MAINNET
         }
     }
 
@@ -26,7 +26,8 @@ object NetworkUtils {
         return when(network) {
             "Mainnet" -> Cluster.MAINNET
             "Testnet" -> Cluster.TESTNET
-            else  -> Cluster.DEVNET
+            "Devnet" -> Cluster.DEVNET
+            else  -> Cluster.MAINNET
         }
     }
 }

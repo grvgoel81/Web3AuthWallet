@@ -1,6 +1,6 @@
 package com.web3auth.wallet.utils
 
-import com.paymennt.crypto.bip32.Network
+/*import com.paymennt.crypto.bip32.Network
 import com.paymennt.crypto.bip32.wallet.AbstractWallet
 import com.paymennt.solanaj.api.rpc.Cluster
 import com.paymennt.solanaj.api.rpc.SolanaRpcClient
@@ -8,12 +8,12 @@ import com.paymennt.solanaj.data.SolanaAccount
 import com.paymennt.solanaj.data.SolanaPublicKey
 import com.paymennt.solanaj.data.SolanaTransaction
 import com.paymennt.solanaj.program.SystemProgram
-import com.paymennt.solanaj.wallet.SolanaWallet
+import com.paymennt.solanaj.wallet.SolanaWallet*/
 
 
 object SolanaManager {
 
-    lateinit var solanaWallet: SolanaWallet
+    /*lateinit var solanaWallet: SolanaWallet
 
     fun createWallet(network: Network = Network.TESTNET,
                      message: String? = "swing brown giraffe enter common awful rent shock mobile wisdom increase banana",
@@ -70,5 +70,5 @@ object SolanaManager {
 
         // publish the transaction
         return client.api.sendTransaction(transaction)
-    }
+    }*/
 }

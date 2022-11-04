@@ -2,26 +2,25 @@ package com.web3auth.wallet.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.guness.ksolana.core.Account
-import com.guness.ksolana.core.PublicKey
-import com.guness.ksolana.core.Transaction
-import com.guness.ksolana.programs.SystemProgram.transfer
-import com.guness.ksolana.rpc.Cluster
-import com.guness.ksolana.rpc.RpcApi
-import com.guness.ksolana.rpc.RpcClient
-import com.paymennt.crypto.lib.Base58
-import com.paymennt.solanaj.exception.SolanajException
 import com.web3auth.wallet.api.ApiHelper
 import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.utils.MemoProgram
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.bitcoinj.core.Base58
+import org.p2p.solanaj.core.PublicKey
+import org.p2p.solanaj.core.Transaction
+import org.p2p.solanaj.programs.SystemProgram.transfer
+import org.p2p.solanaj.rpc.Cluster
+import org.p2p.solanaj.rpc.RpcClient
+import org.p2p.solanaj.rpc.RpcException
+import java.nio.charset.StandardCharsets
 
 class SolanaViewModel: ViewModel() {
 
-    private lateinit var account: Account
-    private lateinit var api: RpcApi
+    private lateinit var client: RpcClient
+    private lateinit var account: org.p2p.solanaj.core.Account
     var priceInUSD = MutableLiveData("")
     var publicAddress = MutableLiveData("")
     var privateKey = MutableLiveData("")
@@ -29,15 +28,19 @@ class SolanaViewModel: ViewModel() {
     var signature = MutableLiveData("")
     var sendTransactionResult = MutableLiveData(Pair(false, ""))
 
-    fun setNetwork(cluster: Cluster) {
-        api =RpcApi(RpcClient(cluster))
+    fun setNetwork(cluster: Cluster, ed25519Key: String) {
+        client = RpcClient(cluster)
+        println("Solana Network: $cluster")
+        account = org.p2p.solanaj.core.Account(ed25519Key.toByteArray(StandardCharsets.UTF_8))
+        val pubKey = account.publicKey.toBase58()
+        val secretKey = Base58.encode(account.secretKey)
+        println("pubKey: $pubKey, secretKey: $secretKey")
     }
 
-    fun getPublicAddress(ed25519Key: String) {
+    fun getPublicAddress() {
         try {
-            var account = Account(Base58.encode(ed25519Key.toByteArray()))
-            publicAddress.postValue(account.publicKey.toString())
-            privateKey.postValue(account.secretKey.toString())
+            publicAddress.postValue(account.publicKey.toBase58())
+            privateKey.postValue(Base58.encode(account.secretKey))
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -57,40 +60,47 @@ class SolanaViewModel: ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     fun getBalance(publicAddress: String) {
         GlobalScope.launch {
-            balance.postValue(api.getBalance(PublicKey(publicAddress)))
-        }
-    }
-
-    fun signTransaction(ed25519Key: String, message: String) {
-        GlobalScope.launch {
-            var account = Account(Base58.encode(ed25519Key.toByteArray()))
-            val transaction = Transaction()
-            transaction.addInstruction(MemoProgram.writeUtf8(account.publicKey, message))
-            signature.postValue(api.sendTransaction(transaction, account))
+            balance.postValue(client.api.getBalance(PublicKey("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo")))
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun signAndSendTransaction(cluster: Cluster, ed25519Key: String, fromKey: String, toKey: String, amount: Long, message: String?) {
+    fun signTransaction(cluster: Cluster, message: String) {
         GlobalScope.launch {
+            client = RpcClient(cluster)
+            val transaction = Transaction()
+            transaction.addInstruction(MemoProgram.writeUtf8(PublicKey(account.publicKey.toBase58()), message))
             try {
-                var api =RpcApi(RpcClient(cluster))
-                var account = Account(Base58.encode(ed25519Key.toByteArray()))
-                val fromPublicKey = PublicKey(fromKey)
-                val toPublicKey = PublicKey(toKey)
-                val transaction = Transaction()
-                transaction.addInstruction(transfer(fromPublicKey, toPublicKey, amount))
-                if(message?.isNotEmpty() == true) {
-                    transaction.addInstruction(MemoProgram.writeUtf8(account.publicKey, message))
-                }
-                val result = api.sendTransaction(transaction, account)
+                signature.postValue(client.api.sendTransaction(transaction, account))
+            } catch (ex: RpcException) {
+                signature.postValue("error")
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun signAndSendTransaction(
+        fromKey: String, toKey: String, amount: Long, message: String?
+    ) {
+        GlobalScope.launch {
+            val fromPublicKey = PublicKey(fromKey)
+            val toPublicKey = PublicKey(toKey)
+            val transaction = Transaction()
+            transaction.addInstruction(transfer(fromPublicKey, toPublicKey, amount))
+            if (message?.isNotEmpty() == true) {
+                transaction.addInstruction(MemoProgram.writeUtf8(account.publicKey, message))
+            }
+            try {
+                val result = client.api.sendTransaction(transaction, account)
                 if (result.isNotEmpty()) {
                     sendTransactionResult.postValue(Pair(true, result))
                 }
-            } catch (ex: SolanajException) {
-                sendTransactionResult.postValue(Pair(false, ex.message.toString()))
+            } catch (ex: RpcException) {
+                sendTransactionResult.postValue(Pair(false, "error"))
                 ex.printStackTrace()
             }
+
         }
     }
 }

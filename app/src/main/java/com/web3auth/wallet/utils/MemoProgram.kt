@@ -1,10 +1,8 @@
 package com.web3auth.wallet.utils
 
-import com.guness.ksolana.core.AccountMeta
-import com.guness.ksolana.core.PublicKey
-import com.guness.ksolana.core.TransactionInstruction
-
-import com.guness.ksolana.programs.Program
+import org.p2p.solanaj.core.AccountMeta
+import org.p2p.solanaj.core.PublicKey
+import org.p2p.solanaj.core.TransactionInstruction
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -25,8 +23,7 @@ object MemoProgram : Program() {
             account?.let {
                 AccountMeta(
                     it,
-                    signer = false,
-                    writable = false
+                    false, false
                 )
             }
         )

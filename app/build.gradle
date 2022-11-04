@@ -74,10 +74,10 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     //solana
-    implementation 'com.github.guness:kSolana:0.1.1'
-    //implementation 'org.p2p:solanaj:1.4'
-    implementation('com.paymennt:solanaj:0.0.7') {
-        exclude group: 'org.bouncycastle'
+    implementation('com.mmorrell:solanaj:1.12') {
+        ['org.bouncycastle', 'com.google.protobuf'].each {
+            exclude group: it
+        }
     }
 
     // android security

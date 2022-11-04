@@ -22,7 +22,7 @@ class LoginActivity: AppCompatActivity() {
         setUpSpinner()
         findViewById<AppCompatButton>(R.id.btnLogin).setOnClickListener {
             startActivity(Intent(this@LoginActivity, OnBoardingActivity::class.java))
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(ISLOGGEDIN, true)
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISLOGGEDIN] = true
             finish()
         }
     }

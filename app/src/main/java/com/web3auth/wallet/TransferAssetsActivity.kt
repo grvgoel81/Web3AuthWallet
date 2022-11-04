@@ -52,6 +52,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     private lateinit var tvEdit: AppCompatTextView
     private lateinit var sessionID: String
     private lateinit var priceInUSD: String
+    private lateinit var ed25519key: String
     private lateinit var transDialog: Dialog
     private lateinit var selectedGasParams: Params
     private var totalCostinETH: Double = 0.0
@@ -73,12 +74,14 @@ class TransferAssetsActivity : AppCompatActivity() {
         publicAddress = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PUBLICKEY, "").toString()
         sessionID = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(SESSION_ID, "").toString()
         priceInUSD = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PRICE_IN_USD, "").toString()
+        ed25519key = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "").toString()
         if(blockChain == getString(R.string.ethereum)) {
             ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
             ethereumViewModel.getGasConfig()
             configureWeb3j()
         } else {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
+            solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(network), ed25519key)
         }
         setUpListeners()
     }
@@ -228,7 +231,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun observeTransactionResult(result: Pair<Boolean, String>) {
-        if (result.second.isNullOrEmpty()) return
+        if (result.second.isEmpty()) return
         if(::transDialog.isInitialized) transDialog.dismiss()
         if (result.first) {
             println("transaction: ${result.second}")
@@ -429,8 +432,8 @@ class TransferAssetsActivity : AppCompatActivity() {
                     selectedGasParams
                 )
             } else {
-                var ed25519key = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "").toString()
-                solanaViewModel.signAndSendTransaction(NetworkUtils.getSolanaNetwork(blockChain), ed25519key, publicAddress, receiptAdd,
+                solanaViewModel.signAndSendTransaction(
+                    publicAddress, receiptAdd,
                     amount = Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]),
                     /*intent.getStringExtra(DATA)*/"hello")
             }

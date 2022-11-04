@@ -70,9 +70,9 @@ class MainActivity : AppCompatActivity() {
             ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
         } else {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
-            solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(blockChain))
+            solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(selectedNetwork), ed25519key)
             solanaViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
-            solanaViewModel.getPublicAddress(ed25519key)
+            solanaViewModel.getPublicAddress()
         }
 
         if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                     msg)
                 showSignatureResult(signatureHash)
             } else {
-                solanaViewModel.signTransaction(ed25519key, msg)
+                solanaViewModel.signTransaction(NetworkUtils.getSolanaNetwork(selectedNetwork), msg)
             }
         }
     }
