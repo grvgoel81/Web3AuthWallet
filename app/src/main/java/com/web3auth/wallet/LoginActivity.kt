@@ -15,7 +15,6 @@ class LoginActivity: AppCompatActivity() {
     private lateinit var networks: Array<String>
     private lateinit var blockchains: Array<String>
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -37,7 +36,7 @@ class LoginActivity: AppCompatActivity() {
             ArrayAdapter(this, R.layout.item_dropdown, networks)
         networkSpinner.setAdapter(networkAdapter)
         networkSpinner.setOnItemClickListener { _, _, position, _ ->
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(NETWORK, networks[position])
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[NETWORK] = networks[position]
         }
 
         blockChainSpinner = findViewById(R.id.spBlockChain)
@@ -45,7 +44,7 @@ class LoginActivity: AppCompatActivity() {
             ArrayAdapter(this, R.layout.item_dropdown, blockchains)
         blockChainSpinner.setAdapter(adapter)
         blockChainSpinner.setOnItemClickListener { _, _, position, _ ->
-            Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.set(BLOCKCHAIN, blockchains[position])
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] = blockchains[position]
         }
     }
 }

@@ -55,6 +55,7 @@
             android:layout_marginStart="53dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_circular"
+            android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintBottom_toTopOf="@+id/tvLogout"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -67,6 +68,7 @@
             android:textColor="@color/black"
             android:hint="@string/email"
             android:textSize="16dp"
+            android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
@@ -164,20 +166,20 @@
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/spBlockChain"
-                android:layout_width="41dp"
-                android:layout_height="13dp"
+            <Spinner
+                android:id="@+id/spCurrency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/tvNetwork"
                 android:layout_centerHorizontal="true"
-                android:layout_marginStart="3dp"
-                android:layout_marginTop="34dp"
+                android:inputType="none"
+                android:layout_marginTop="20dp"
                 android:layout_toRightOf="@+id/tvBalance"
-                android:drawableRight="@drawable/ic_polygon"
-                android:text="ETH"
+                android:text="Eth"
+                android:layout_gravity="left"
+                android:padding="0dp"
                 android:textColor="@color/black"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvExchangeRate"
@@ -195,6 +197,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
                 tools:text="= 0.012 USD"
+                android:visibility="gone"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/tvNetwork"
                 android:textSize="14sp" />

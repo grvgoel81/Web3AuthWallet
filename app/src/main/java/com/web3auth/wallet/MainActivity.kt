@@ -11,7 +11,11 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
@@ -37,8 +41,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectedNetwork: String
     private lateinit var ed25519key: String
     private lateinit var tvExchangeRate: AppCompatTextView
-    private lateinit var tvPriceInUSD: AppCompatTextView
     private lateinit var tvViewTransactionStatus: AppCompatTextView
+    private lateinit var spCurrency: Spinner
     private var priceInUSD: String = ""
     private lateinit var etMessage: AppCompatEditText
     private lateinit var btnSign: AppCompatButton
@@ -152,8 +156,6 @@ class MainActivity : AppCompatActivity() {
                 progressDialog.dismiss()
                 if (it > 0.0 && priceInUSD.isNotEmpty()) {
                     tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
-                    val usdPrice = Web3AuthUtils.getPriceInUSD(it, priceInUSD.toDouble())
-                    tvPriceInUSD.text = "= ".plus(usdPrice.toDouble().roundOff()).plus(" USD")
                 }
             }
         } else {
@@ -195,7 +197,6 @@ class MainActivity : AppCompatActivity() {
     private fun setUpListeners() {
         tvExchangeRate = findViewById(R.id.tvExchangeRate)
         etMessage = findViewById(R.id.etMessage)
-        tvPriceInUSD = findViewById(R.id.tvPriceInUSD)
         btnSign = findViewById(R.id.btnSign)
         tvBalance = findViewById(R.id.tvBalance)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
@@ -237,7 +238,8 @@ class MainActivity : AppCompatActivity() {
     private fun setData() {
         findViewById<AppCompatTextView>(R.id.tvNetwork).text =
             blockChain.plus(" ").plus(selectedNetwork)
-        findViewById<AppCompatTextView>(R.id.spBlockChain).text = Web3AuthUtils.getCurrency(blockChain)
+        spCurrency = findViewById(R.id.spCurrency)
+        setUpSpinner()
 
         tvViewTransactionStatus = findViewById(R.id.tvViewTransactionStatus)
         tvViewTransactionStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
@@ -247,6 +249,26 @@ class MainActivity : AppCompatActivity() {
 
         if(blockChain == getString(R.string.ethereum)) {
             ethereumViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
+        }
+    }
+
+    private fun setUpSpinner() {
+        var currencies: MutableList<String> = mutableListOf()
+        currencies.add(Web3AuthUtils.getCurrency(blockChain))
+        currencies.add(getString(R.string.usd))
+        val currencyAdapter: ArrayAdapter<String> =
+            ArrayAdapter(this, R.layout.item_dropdown, currencies)
+        spCurrency.adapter = currencyAdapter
+        spCurrency.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                if(currencies[position] == getString(R.string.usd)) {
+                    getCurrencyInUSD()
+                } else {
+                    getCurrencyInSelectedBlockChain()
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
 
@@ -286,9 +308,17 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.show()
     }
+
+    private fun getCurrencyInUSD() {
+        if(blockChain == getString(R.string.ethereum)) {
+            tvBalance.text = String.format("%.6f", Web3AuthUtils.getPriceinUSD(tvBalance.text.toString().toDouble(), priceInUSD.toDouble()))
+        } else {
+            tvBalance.text = String.format("%.4f", Web3AuthUtils.getPriceinUSD(tvBalance.text.toString().toDouble(), priceInUSD.toDouble()))
+        }
+    }
     
     private fun showSignatureResult(signatureHash: String) {
-        if(signatureHash.isEmpty()) {
+        if(signatureHash == "error") {
             showSignTransactionDialog(false)
         } else {
             showSignTransactionDialog(true, signatureHash)
@@ -329,6 +359,14 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun getCurrencyInSelectedBlockChain() {
+        if(blockChain == getString(R.string.ethereum)) {
+            ethereumViewModel.retrieveBalance(publicAddress)
+        } else {
+            solanaViewModel.getBalance(publicAddress)
+        }
+    }
+
     private fun copyToClipboard(text: String) {
         val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText("text", text)
@@ -338,13 +376,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        if(blockChain == getString(R.string.ethereum)) {
-            ethereumViewModel.retrieveBalance(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(PUBLICKEY, "")
-                .toString()
-            )
-        } else {
-            solanaViewModel.getBalance(publicAddress)
-        }
+        getCurrencyInSelectedBlockChain()
     }
 
     private fun logout() {

@@ -53,6 +53,7 @@
     <string name="average">Average</string>
     <string name="save">Save</string>
     <string name="usd">USD</string>
+    <string name="inr">INR</string>
     <string name="invalid_message">Invalid Message</string>
     <string name="loading_balance">Loading balance</string>
     <string name="connect_to_internet">Internet Connection not available.</string>
