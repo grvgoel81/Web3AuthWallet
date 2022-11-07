@@ -27,6 +27,7 @@ import com.web3auth.wallet.api.models.Params
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
 import com.web3auth.wallet.viewmodel.SolanaViewModel
+import org.p2p.solanaj.core.PublicKey
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.Web3ClientVersion
 import org.web3j.protocol.http.HttpService
@@ -283,6 +284,9 @@ class TransferAssetsActivity : AppCompatActivity() {
     private fun isValidSolanaDetails(): Boolean {
         return if(etRecipientAddress.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_address))
+            false
+        } else if (etRecipientAddress.text.toString().trim().length < PublicKey.PUBLIC_KEY_LENGTH) {
+            toast(getString(R.string.invalid_address))
             false
         } else if(etAmountToSend.text?.isNullOrEmpty() == true) {
             toast(getString(R.string.enter_amt_to_transfer))

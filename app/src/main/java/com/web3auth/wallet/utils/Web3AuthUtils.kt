@@ -1,6 +1,7 @@
 package com.web3auth.wallet.utils
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.icu.util.CurrencyAmount
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -78,7 +79,7 @@ object Web3AuthUtils {
         return decimalWei / getEtherInWei()
     }
 
-    fun toGwieEther(balance: BigDecimal): Double {
+    private fun toGwieEther(balance: BigDecimal): Double {
         var decimalWei = balance.toDouble()
         return decimalWei / getEtherInGwei()
     }
@@ -145,15 +146,20 @@ object Web3AuthUtils {
         }
     }
 
-    /**
-     * convert byte array to hex string
-     */
-    fun convertByteToHexadecimal(byteArray: ByteArray): String {
-        var hex = ""
-        // Iterating through each byte in the array
-        for (i in byteArray) {
-            hex += String.format("%02X", i)
+    fun getSocialLoginIcon(context: Context, loginType: String): Int {
+        return when(loginType) {
+            context.getString(R.string.google) -> R.drawable.iv_google
+            context.getString(R.string.facebook) -> R.drawable.ic_facebook
+            context.getString(R.string.twitter) -> R.drawable.ic_twitter
+            context.getString(R.string.discord) -> R.drawable.ic_discord
+            context.getString(R.string.line) -> R.drawable.ic_line
+            context.getString(R.string.apple) -> R.drawable.ic_apple
+            context.getString(R.string.linkedin) -> R.drawable.ic_linkedin
+            context.getString(R.string.wechat) -> R.drawable.ic_wechat
+            context.getString(R.string.github) -> R.drawable.ic_github
+            context.getString(R.string.reddit) -> R.drawable.ic_reddit
+            context.getString(R.string.twitch) -> R.drawable.ic_twitch_inactive
+            else -> R.drawable.iv_google
         }
-        return hex.lowercase(Locale.ROOT)
     }
 }

@@ -51,19 +51,19 @@ class OnBoardingActivity: AppCompatActivity() {
             }
         }
         findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        findViewById<AppCompatButton>(R.id.btnContinue).setOnClickListener { signIn(Provider.EMAIL_PASSWORDLESS) }
-        findViewById<AppCompatImageView>(R.id.ivGoogle).setOnClickListener { signIn(Provider.GOOGLE) }
-        findViewById<AppCompatImageView>(R.id.ivFacebook).setOnClickListener { signIn(Provider.FACEBOOK) }
-        findViewById<AppCompatImageView>(R.id.ivTwitter).setOnClickListener { signIn(Provider.TWITTER) }
-        findViewById<AppCompatImageView>(R.id.ivDiscord).setOnClickListener { signIn(Provider.DISCORD) }
-        findViewById<AppCompatImageView>(R.id.ivLine).setOnClickListener { signIn(Provider.LINE) }
-        findViewById<AppCompatImageView>(R.id.ivReddit).setOnClickListener { signIn(Provider.REDDIT) }
-        findViewById<AppCompatImageView>(R.id.ivApple).setOnClickListener { signIn(Provider.APPLE) }
-        findViewById<AppCompatImageView>(R.id.ivLinkedin).setOnClickListener { signIn(Provider.LINKEDIN) }
-        findViewById<AppCompatImageView>(R.id.ivWechat).setOnClickListener { signIn(Provider.WECHAT) }
-        findViewById<AppCompatImageView>(R.id.ivKakao).setOnClickListener { signIn(Provider.KAKAO) }
-        findViewById<AppCompatImageView>(R.id.ivGithub).setOnClickListener { signIn(Provider.GITHUB) }
-        findViewById<AppCompatImageView>(R.id.ivTwitter).setOnClickListener { signIn(Provider.TWITCH) }
+        findViewById<AppCompatButton>(R.id.btnContinue).setOnClickListener { signIn(Provider.EMAIL_PASSWORDLESS, "") }
+        findViewById<AppCompatImageView>(R.id.ivGoogle).setOnClickListener { signIn(Provider.GOOGLE, getString(R.string.google)) }
+        findViewById<AppCompatImageView>(R.id.ivFacebook).setOnClickListener { signIn(Provider.FACEBOOK, getString(R.string.facebook)) }
+        findViewById<AppCompatImageView>(R.id.ivTwitter).setOnClickListener { signIn(Provider.TWITTER, getString(R.string.twitter)) }
+        findViewById<AppCompatImageView>(R.id.ivDiscord).setOnClickListener { signIn(Provider.DISCORD, getString(R.string.discord)) }
+        findViewById<AppCompatImageView>(R.id.ivLine).setOnClickListener { signIn(Provider.LINE, getString(R.string.line)) }
+        findViewById<AppCompatImageView>(R.id.ivReddit).setOnClickListener { signIn(Provider.REDDIT, getString(R.string.reddit)) }
+        findViewById<AppCompatImageView>(R.id.ivApple).setOnClickListener { signIn(Provider.APPLE, getString(R.string.apple)) }
+        findViewById<AppCompatImageView>(R.id.ivLinkedin).setOnClickListener { signIn(Provider.LINKEDIN, getString(R.string.linkedin)) }
+        findViewById<AppCompatImageView>(R.id.ivWechat).setOnClickListener { signIn(Provider.WECHAT, getString(R.string.wechat)) }
+        findViewById<AppCompatImageView>(R.id.ivKakao).setOnClickListener { signIn(Provider.KAKAO, getString(R.string.kakao)) }
+        findViewById<AppCompatImageView>(R.id.ivGithub).setOnClickListener { signIn(Provider.GITHUB, getString(R.string.github)) }
+        findViewById<AppCompatImageView>(R.id.ivTwitch).setOnClickListener { signIn(Provider.TWITCH, getString(R.string.twitch)) }
     }
 
     private fun configureWeb3Auth() {
@@ -86,7 +86,8 @@ class OnBoardingActivity: AppCompatActivity() {
         web3Auth.setResultUrl(intent.data)
     }
 
-    private fun signIn(loginProvider: Provider = Provider.GOOGLE) {
+    private fun signIn(loginProvider: Provider = Provider.GOOGLE, loginType: String) {
+        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[loginType] = loginType
         val hintEmailEditText = findViewById<AppCompatEditText>(R.id.etEmail)
         var extraLoginOptions: ExtraLoginOptions? = null
         if (loginProvider == Provider.EMAIL_PASSWORDLESS) {

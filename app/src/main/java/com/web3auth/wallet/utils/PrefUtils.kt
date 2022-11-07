@@ -3,7 +3,9 @@ package com.web3auth.wallet.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
@@ -87,6 +89,12 @@ fun View.hide() {
     this.visibility = View.GONE
 }
 
+fun TextView.addLeftDrawable(drawable: Int, padding: Int = 12) {
+    val imgDrawable = ContextCompat.getDrawable(context, drawable)
+    compoundDrawablePadding = padding
+    setCompoundDrawablesWithIntrinsicBounds(imgDrawable, null, null, null)
+}
+
 enum class TransactionStatus {
     PLACED,
     SUCCESSFUL,
@@ -102,6 +110,7 @@ const val ED25519Key = "ed25519Key"
 const val ISLOGGEDIN = "isLoggedIn"
 const val ISONBOARDED = "isOnboarded"
 const val PUBLICKEY = "publicKey"
+const val LOGINTYPE = "loginType"
 const val PRICE_IN_USD = "priceInUSD"
 const val LOGOUT = "logout"
 const val DATA = "data"

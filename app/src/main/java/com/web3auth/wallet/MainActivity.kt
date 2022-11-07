@@ -10,13 +10,16 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
@@ -31,6 +34,7 @@ import com.web3auth.core.types.WhiteLabelData
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
 import com.web3auth.wallet.viewmodel.SolanaViewModel
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -117,7 +121,14 @@ class MainActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.tvName).text = getString(R.string.welcome).plus(" ").plus(
             web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
         ).plus("!")
-        findViewById<AppCompatTextView>(R.id.tvEmail).text = web3AuthResponse?.userInfo?.email
+        /*title = getString(R.string.welcome).plus(" ").plus(
+            web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
+        ).plus("!")
+        supportActionBar?.subtitle = web3AuthResponse?.userInfo?.email*/
+        val tvEmail = findViewById<AppCompatTextView>(R.id.tvEmail)
+        tvEmail.text = web3AuthResponse?.userInfo?.email
+        val loginType = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(LOGINTYPE, "")
+        tvEmail.addLeftDrawable(Web3AuthUtils.getSocialLoginIcon(this, loginType.toString()))
         setData()
     }
 
@@ -206,7 +217,11 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        findViewById<AppCompatImageView>(R.id.ivLogout).setOnClickListener { logout() }
+        var ivLogout = findViewById<AppCompatImageView>(R.id.ivLogout)
+        ivLogout.setOnClickListener { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            showPopupOption(ivLogout)
+        }
+        }
         findViewById<AppCompatTextView>(R.id.tvLogout).setOnClickListener { logout() }
         findViewById<AppCompatImageView>(R.id.ivQRCode).setOnClickListener {
             showQRDialog(publicAddress)
@@ -372,6 +387,29 @@ class MainActivity : AppCompatActivity() {
         val clipData = ClipData.newPlainText("text", text)
         clipboardManager.setPrimaryClip(clipData)
         toast("Text Copied")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        /*if (menu is MenuBuilder) {
+            menu.setOptionalIconsVisible(true)
+        }*/
+        menuInflater.inflate(R.menu.main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun showPopupOption(view: View) {
+        val popupMenu = PopupMenu(this, view)
+        popupMenu.menuInflater.inflate(R.menu.main,popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.logout -> {}
+                R.id.change_network -> {}
+            }
+            true
+        }
+        popupMenu.setForceShowIcon(true)
+        popupMenu.show()
     }
 
     override fun onRestart() {
