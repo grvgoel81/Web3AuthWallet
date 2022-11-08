@@ -19,7 +19,6 @@ import android.widget.PopupMenu
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
@@ -121,10 +120,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.tvName).text = getString(R.string.welcome).plus(" ").plus(
             web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
         ).plus("!")
-        /*title = getString(R.string.welcome).plus(" ").plus(
-            web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
-        ).plus("!")
-        supportActionBar?.subtitle = web3AuthResponse?.userInfo?.email*/
+        
         val tvEmail = findViewById<AppCompatTextView>(R.id.tvEmail)
         tvEmail.text = web3AuthResponse?.userInfo?.email
         val loginType = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(LOGINTYPE, "")
@@ -403,8 +399,12 @@ class MainActivity : AppCompatActivity() {
         popupMenu.menuInflater.inflate(R.menu.main,popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.logout -> {}
-                R.id.change_network -> {}
+                R.id.settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+                R.id.logout -> {
+                    logout()
+                }
             }
             true
         }

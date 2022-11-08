@@ -50,6 +50,7 @@
             android:name=".MainActivity">
         </activity>
         <activity android:name=".TransferAssetsActivity"/>
+        <activity android:name=".SettingsActivity"/>
     </application>
 
 </manifest>

@@ -110,7 +110,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             tvEth.text = Web3AuthUtils.getCurrency(blockChain)
         }
 
-        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressed() }
+        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         findViewById<AppCompatImageView>(R.id.ivScan).setOnClickListener { scanQRCode() }
 
         resetTotalCost()

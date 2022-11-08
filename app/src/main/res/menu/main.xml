@@ -2,18 +2,18 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- action button for logout -->
+    <!-- action button for settings -->
     <item
-        android:title="Logout"
-        android:id="@+id/logout"
-        android:icon="@drawable/ic_logout"
+        android:title="Settings"
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_baseline_settings_24"
         app:showAsAction="never" />
 
     <!-- action button for refresh -->
     <item
-        android:title="Change Network"
-        android:id="@+id/change_network"
-        android:icon="@drawable/ic_wifi"
+        android:title="Logout"
+        android:id="@+id/logout"
+        android:icon="@drawable/ic_logout"
         app:showAsAction="never" />
 
 </menu>

@@ -13,6 +13,7 @@
     <string name="account_details">Account Details</string>
     <string name="account_balance">Account Balance</string>
     <string name="transfer_assets">Transfer assets</string>
+    <string name="settings">Settings</string>
     <string name="sign_message_demo">Sign Message (Demo)</string>
     <string name="message">Message</string>
     <string name="enter_message">Enter your message here</string>>
