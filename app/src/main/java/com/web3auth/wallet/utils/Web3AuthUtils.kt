@@ -29,9 +29,14 @@ object Web3AuthUtils {
 
     fun getCurrency(blockChain: String): String {
         return when (blockChain) {
-            "Ethereum" -> "ETH"
-            "Solana" -> "SOL"
-            else -> "EthAddress"
+            "ETH Mainnet" -> "ETH"
+            "Solana Testnet" -> "SOL"
+            "Solana Mainnet" -> "SOL"
+            "Solana Devnet" -> "SOL"
+            "Polygon Mainnet" -> "MATIC"
+            "Binance Mainnet" -> "BNB"
+            "ETH Goerli" -> "ETH"
+            else -> "ETH"
         }
     }
 
@@ -57,15 +62,22 @@ object Web3AuthUtils {
     fun getTransactionStatusText(context: Context, blockChain: String): String {
         return when(blockChain) {
             "Ethereum" -> context.getString(R.string.eth_view_transaction_status)
-            "Solana" -> context.getString(R.string.sol_view_transaction_status)
+            "Solana Mainnet" -> context.getString(R.string.sol_view_transaction_status)
+            "Solana Testnet" -> context.getString(R.string.sol_view_transaction_status)
+            "Solana Devnet" -> context.getString(R.string.sol_view_transaction_status)
             else -> context.getString(R.string.eth_view_transaction_status)
         }
     }
 
     fun getViewTransactionUrl(context: Context, blockChain: String): String {
         return when(blockChain) {
-            "Ethereum" -> context.getString(R.string.eth_transaction_status_url)
-            "Solana" -> context.getString(R.string.sol_transaction_status_url)
+            "ETH Mainnet" -> context.getString(R.string.eth_transaction_status_url)
+            "Polygon Mainnet" -> context.getString(R.string.polygon_transaction_status_url)
+            "Binance Mainnet" -> "BNB"
+            "ETH Goerli" -> context.getString(R.string.eth_transaction_status_url)
+            "Solana Mainnet" -> context.getString(R.string.sol_transaction_status_url)
+            "Solana Testnet" -> context.getString(R.string.sol_transaction_status_url_testnet)
+            "Solana Devnet" -> context.getString(R.string.sol_transaction_status_url_devnet)
             else -> context.getString(R.string.eth_transaction_status_url)
         }
     }

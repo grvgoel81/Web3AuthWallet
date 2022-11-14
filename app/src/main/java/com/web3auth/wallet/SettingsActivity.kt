@@ -25,7 +25,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         supportActionBar?.hide()
 
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "Ethereum").toString()
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "ETH Mainnet").toString()
         network = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet").toString()
         setData()
         setUpSpinner()
@@ -54,7 +54,6 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-        findViewById<AppCompatTextView>(R.id.tvNetwork).text =
-            blockChain.plus(" ").plus(network)
+        findViewById<AppCompatTextView>(R.id.tvNetwork).text = blockChain.plus(" ")
     }
 }

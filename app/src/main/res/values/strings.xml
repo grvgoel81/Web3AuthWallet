@@ -33,10 +33,14 @@
     <string name="try_again">Try again now</string>
     <string name="eth_view_transaction_status"><u>View transaction’s status on Etherscan</u></string>
     <string name="sol_view_transaction_status"><u>View transaction’s status on Solana Explorer</u></string>
-    <string name="eth_transaction_status_url">https://mumbai.polygonscan.com/</string>
+    <string name="polygon_transaction_status_url">https://mumbai.polygonscan.com/</string>
+    <string name="eth_transaction_status_url">https://etherscan.io/</string>
     <string name="sol_transaction_status_url">https://explorer.solana.com/</string>
+    <string name="sol_transaction_status_url_testnet">https://explorer.solana.com/?cluster=testnet</string>
+    <string name="sol_transaction_status_url_devnet">https://explorer.solana.com/?cluster=devnet</string>
     <string name="sign_failed">Sign Failed</string>
     <string name="sign_success">Sign Successfully</string>
+    <string name="insufficient_balance">Insufficient Balance</string>
     <string name="copy"><u>Copy</u></string>
     <string name="confirm_transaction">Confirm transaction</string>
     <string name="amount_to_send">Amount to send</string>
@@ -74,7 +78,7 @@
     <string name="enter_address">Enter Address</string>
     <string name="invalid_address">Invalid address</string>
     <string name="web3auth_project_id">BASdZxp5tWqPGkzbOU4VMJsnz8QOpJ2pyxf6kZcuxI8AJ1gsOw5MgbW96RpAAx_Kk-5p4rhOopPhCa9kR_9mKpE</string>
-    <string name="ethereum">Ethereum</string>
+    <string name="ethereum">ETH Mainnet</string>
     <string name="solana">Solana</string>
 
 
@@ -85,8 +89,13 @@
     </string-array>
 
     <string-array name="blockchains">
-        <item>Ethereum</item>
-        <item>Solana</item>
+        <item>ETH Mainnet</item>
+        <item>Polygon Mainnet</item>
+        <item>Binance Mainnet</item>
+        <item>ETH Goerli</item>
+        <item>Solana Mainnet</item>
+        <item>Solana Testnet</item>
+        <item>Solana Devnet</item>
     </string-array>
 
     <string-array name="networkAddress">

@@ -2,11 +2,15 @@ package com.web3auth.wallet.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.web3auth.wallet.Web3AuthWalletApp
 import com.web3auth.wallet.api.ApiHelper
 import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.api.models.EthGasAPIResponse
 import com.web3auth.wallet.api.models.GasApiResponse
 import com.web3auth.wallet.api.models.Params
+import com.web3auth.wallet.utils.BLOCKCHAIN
+import com.web3auth.wallet.utils.NetworkUtils
+import com.web3auth.wallet.utils.web3AuthWalletPreferences
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.web3j.crypto.*
@@ -36,13 +40,12 @@ class EthereumViewModel : ViewModel() {
     var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
 
     init {
-        configureWeb3j()
+        configureWeb3j(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "").toString())
         getMaxTransactionConfig()
     }
 
-    private fun configureWeb3j() {
-        val url =
-            "https://rpc-mumbai.maticvigil.com/" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
+    private fun configureWeb3j(blockChain: String) {
+        val url = NetworkUtils.getRpcUrl(blockChain)
         web3 = Web3j.build(HttpService(url))
         try {
             val clientVersion: Web3ClientVersion = web3.web3ClientVersion().sendAsync().get()

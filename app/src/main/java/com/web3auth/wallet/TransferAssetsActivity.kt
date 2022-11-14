@@ -70,7 +70,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             longToast(getString(R.string.connect_to_internet))
             return
         }
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "Ethereum").toString()
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "ETH Mainnet").toString()
         network = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet").toString()
         publicAddress = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PUBLICKEY, "").toString()
         sessionID = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(SESSION_ID, "").toString()
@@ -82,7 +82,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             configureWeb3j()
         } else {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
-            solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(network), ed25519key)
+            solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(blockChain), ed25519key)
         }
         setUpListeners()
     }
@@ -103,7 +103,7 @@ class TransferAssetsActivity : AppCompatActivity() {
         etBlockChainAdd.setText(blockChain.let { Web3AuthUtils.getBlockChainName(it) })
         etBlockChain.setText(blockChain)
 
-        if(blockChain == getString(R.string.solana)) {
+        if(blockChain.contains(getString(R.string.solana))) {
             findViewById<AppCompatTextView>(R.id.tvTransactionFee).hide()
             tvEdit.hide()
             flTransaction.hide()
