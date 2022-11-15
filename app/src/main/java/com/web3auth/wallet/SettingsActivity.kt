@@ -16,7 +16,7 @@ import com.web3auth.wallet.utils.web3AuthWalletPreferences
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var spBlockChain: AutoCompleteTextView
-    private lateinit var btnSave: Button
+    private lateinit var tvNetwork: AppCompatTextView
     private lateinit var blockChain: String
     private lateinit var network: String
 
@@ -40,20 +40,18 @@ class SettingsActivity : AppCompatActivity() {
         spBlockChain.setAdapter(adapter)
         spBlockChain.setOnItemClickListener { _, _, position, _ ->
             Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] = blockchains[position]
-        }
-    }
-
-    private fun setData() {
-        spBlockChain = findViewById(R.id.spBlockChain)
-        btnSave = findViewById(R.id.btnSave)
-        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
-
-        btnSave.setOnClickListener {
+            tvNetwork.text = blockchains[position]
             val intent = Intent(this, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
             finish()
         }
-        findViewById<AppCompatTextView>(R.id.tvNetwork).text = blockChain.plus(" ")
+    }
+
+    private fun setData() {
+        spBlockChain = findViewById(R.id.spBlockChain)
+        tvNetwork = findViewById(R.id.tvNetwork)
+        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        tvNetwork.text = blockChain
     }
 }

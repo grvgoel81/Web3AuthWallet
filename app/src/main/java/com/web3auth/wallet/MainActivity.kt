@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var etMessage: AppCompatEditText
     private lateinit var btnSign: AppCompatButton
     private lateinit var tvBalance: AppCompatTextView
+    private lateinit var tvNetwork: AppCompatTextView
     private lateinit var progressDialog: ProgressDialog
     private lateinit var ethereumViewModel: EthereumViewModel
     private lateinit var solanaViewModel: SolanaViewModel
@@ -251,7 +252,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setData() {
-        findViewById<AppCompatTextView>(R.id.tvNetwork).text = blockChain.plus(" ")
+        tvNetwork = findViewById(R.id.tvNetwork)
+        tvNetwork.text = blockChain.plus(" ")
         spCurrency = findViewById(R.id.spCurrency)
         setUpSpinner()
 
@@ -259,6 +261,9 @@ class MainActivity : AppCompatActivity() {
         tvViewTransactionStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
         tvViewTransactionStatus.setOnClickListener {
             Web3AuthUtils.openCustomTabs(this@MainActivity, Web3AuthUtils.getViewTransactionUrl(this, blockChain))
+        }
+        tvNetwork.setOnClickListener {
+            navigateToSettings()
         }
 
         if(!blockChain.contains(getString(R.string.solana))) {
@@ -276,6 +281,7 @@ class MainActivity : AppCompatActivity() {
         spCurrency.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                if(tvBalance.text.toString().toDouble().compareTo(0.0) == 0)  return
                 if(currencies[position] == getString(R.string.usd)) {
                     getCurrencyInUSD()
                 } else {
@@ -389,9 +395,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        /*if (menu is MenuBuilder) {
-            menu.setOptionalIconsVisible(true)
-        }*/
         menuInflater.inflate(R.menu.main, menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -403,7 +406,7 @@ class MainActivity : AppCompatActivity() {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.settings -> {
-                    startActivity(Intent(this, SettingsActivity::class.java))
+                    navigateToSettings()
                 }
                 R.id.logout -> {
                     logout()
@@ -413,6 +416,10 @@ class MainActivity : AppCompatActivity() {
         }
         popupMenu.setForceShowIcon(true)
         popupMenu.show()
+    }
+
+    private fun navigateToSettings() {
+        startActivity(Intent(this, SettingsActivity::class.java))
     }
 
     override fun onRestart() {
