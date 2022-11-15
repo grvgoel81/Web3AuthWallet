@@ -70,7 +70,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Network"
+                android:text="@string/select_blockchain"
                 android:layout_marginTop="20dp"
                 android:drawablePadding="5dp"
                 android:drawableStart="@drawable/ic_wifi"
