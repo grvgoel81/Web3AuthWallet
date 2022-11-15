@@ -134,9 +134,10 @@ class EthereumViewModel : ViewModel() {
                     Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
                 val gasLimit: BigInteger = BigInteger.valueOf(21000)
                 val gasFee = web3.ethGasPrice().send().gasPrice
+                val chainId = web3.ethChainId().sendAsync().get()
 
                 val rawTransaction: RawTransaction = RawTransaction.createTransaction(
-                    80001,
+                    chainId.chainId.toLong(),
                     nonce,
                     gasLimit,
                     recipientAddress,
