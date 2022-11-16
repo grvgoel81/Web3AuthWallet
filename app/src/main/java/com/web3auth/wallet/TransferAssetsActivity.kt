@@ -101,12 +101,12 @@ class TransferAssetsActivity : AppCompatActivity() {
 
         etBlockChainAdd.setText(blockChain.let { Web3AuthUtils.getBlockChainName(it) })
         etBlockChain.setText(blockChain)
+        tvEth.text = Web3AuthUtils.getCurrency(blockChain)
 
         if(blockChain.contains(getString(R.string.solana))) {
             findViewById<AppCompatTextView>(R.id.tvTransactionFee).hide()
             tvEdit.hide()
             flTransaction.hide()
-            tvEth.text = Web3AuthUtils.getCurrency(blockChain)
         }
 
         findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }

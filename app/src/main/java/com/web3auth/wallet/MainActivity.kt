@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                     tvExchangeRate.text =
                         "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
                             .plus(priceInUSD).plus(" " + getString(R.string.usd))
-                    if (publicAddress.isNotEmpty()) {
+                    if (this::publicAddress.isInitialized && publicAddress.isNotEmpty()) {
                         ethereumViewModel.retrieveBalance(publicAddress)
                     }
                 }

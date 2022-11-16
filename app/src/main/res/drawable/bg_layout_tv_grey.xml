@@ -6,8 +6,8 @@
         android:color="@color/activity_bg_color" />
     <corners android:radius="24dp" />
     <padding
-        android:bottom="10dp"
-        android:left="20dp"
-        android:right="20dp"
-        android:top="10dp" />
+        android:bottom="8dp"
+        android:left="15dp"
+        android:right="15dp"
+        android:top="8dp" />
 </shape>

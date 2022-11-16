@@ -38,7 +38,7 @@ object NetworkUtils {
             "Solana Testnet" -> "SOL"
             "Solana Mainnet" -> "SOL"
             "Solana Devnet" -> "SOL"
-            "Polygon Mainnet" -> "https://rpc.ankr.com/polygon"
+            "Polygon Mainnet" -> "https://rpc-mumbai.maticvigil.com/"
             "Binance Mainnet" -> "https://rpc.ankr.com/bsc"
             "ETH Goerli" -> "https://goerli.infura.io/v3/7f287687b3d049e2bea7b64869ee30a3"
             else -> "ETH"
