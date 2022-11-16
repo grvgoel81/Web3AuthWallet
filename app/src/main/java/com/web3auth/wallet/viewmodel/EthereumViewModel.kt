@@ -11,8 +11,10 @@ import com.web3auth.wallet.api.models.Params
 import com.web3auth.wallet.utils.BLOCKCHAIN
 import com.web3auth.wallet.utils.NetworkUtils
 import com.web3auth.wallet.utils.web3AuthWalletPreferences
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.web3j.crypto.*
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
@@ -134,7 +136,9 @@ class EthereumViewModel : ViewModel() {
                     Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
                 val gasLimit: BigInteger = BigInteger.valueOf(21000)
                 val gasFee = web3.ethGasPrice().send().gasPrice
-                val chainId = web3.ethChainId().sendAsync().get()
+                val chainId = withContext(Dispatchers.IO) {
+                    web3.ethChainId().sendAsync().get()
+                }
 
                 val rawTransaction: RawTransaction = RawTransaction.createTransaction(
                     chainId.chainId.toLong(),
@@ -146,6 +150,7 @@ class EthereumViewModel : ViewModel() {
                     BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 4),
                     BigInteger.valueOf(params.suggestedMaxFeePerGas?.toLong() ?: 67)
                 )
+
                 // Sign the transaction
                 val signedMessage: ByteArray =
                     TransactionEncoder.signMessage(rawTransaction, credentials)

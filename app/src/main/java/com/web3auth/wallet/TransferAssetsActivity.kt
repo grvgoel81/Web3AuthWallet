@@ -183,7 +183,9 @@ class TransferAssetsActivity : AppCompatActivity() {
         }
 
         tvEdit.setOnClickListener {
-            showMaxTransactionSelectDialog()
+            if(ethGasAPIResponse != null) {
+                showMaxTransactionSelectDialog()
+            }
         }
 
         if(blockChain.contains(getString(R.string.solana))) {
@@ -196,6 +198,9 @@ class TransferAssetsActivity : AppCompatActivity() {
                     ethGasAPIResponse = it
                     gasFee = it.fastest
                     processTime = it.fastestWait
+                    tvEdit.show()
+                } else {
+                    tvEdit.hide()
                 }
             }
 
@@ -319,18 +324,28 @@ class TransferAssetsActivity : AppCompatActivity() {
         val tvCancel = dialog.findViewById<AppCompatTextView>(R.id.tvCancel)
         val btnSave = dialog.findViewById<AppCompatButton>(R.id.btnSave)
 
-        tvFastProcessTime.text = getString(R.string.process_in).plus(" ")
-            .plus(Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.fastestWait)).plus(" ").plus(getString(R.string.seconds))
-        tvAvgProcessTime.text = getString(R.string.process_in).plus(" ")
-            .plus(Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.fastWait)).plus(" ").plus(getString(R.string.seconds))
-        tvSlowProcessTime.text = getString(R.string.process_in).plus(" ")
-            .plus(Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.avgWait)).plus(" ").plus(getString(R.string.seconds))
-        tvFastEth.text = getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
-            .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
-        tvAvgEth.text = getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fast))
-            .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
-        tvSlowEth.text = getString(R.string.upto).plus(" ").plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.average))
-            .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
+        try {
+            tvFastProcessTime.text = getString(R.string.process_in).plus(" ")
+                .plus(Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.fastestWait)).plus(" ")
+                .plus(getString(R.string.seconds))
+            tvAvgProcessTime.text = getString(R.string.process_in).plus(" ")
+                .plus(Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.fastWait)).plus(" ")
+                .plus(getString(R.string.seconds))
+            tvSlowProcessTime.text = getString(R.string.process_in).plus(" ")
+                .plus(Web3AuthUtils.convertMinsToSec(ethGasAPIResponse.avgWait)).plus(" ")
+                .plus(getString(R.string.seconds))
+            tvFastEth.text = getString(R.string.upto).plus(" ")
+                .plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fastest))
+                .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
+            tvAvgEth.text = getString(R.string.upto).plus(" ")
+                .plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.fast))
+                .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
+            tvSlowEth.text = getString(R.string.upto).plus(" ")
+                .plus(Web3AuthUtils.getMaxTransactionFee(ethGasAPIResponse.average))
+                .plus(" ").plus(Web3AuthUtils.getCurrency(blockChain))
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
 
         clFast.setOnClickListener {
             rbAvg.isChecked = false

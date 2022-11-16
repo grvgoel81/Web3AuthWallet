@@ -34,7 +34,6 @@ import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
 import com.web3auth.wallet.viewmodel.SolanaViewModel
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var web3Auth: Web3Auth
