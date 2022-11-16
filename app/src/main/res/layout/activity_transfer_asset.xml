@@ -175,6 +175,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvSendAll">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/etAmountToSend"
                 android:layout_width="match_parent"
@@ -184,28 +188,33 @@
                 android:hint="0.00"
                 android:inputType="numberDecimal"
                 android:paddingLeft="20sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvSendTo" />
+                app:layout_constraintStart_toStartOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvEth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="137dp"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/bg_layout_tv_blue"
-                android:text="ETH"
-                android:textColor="#6F717A" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvEth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toStartOf="@+id/tvUSD"
+                    android:background="@drawable/bg_layout_tv_blue"
+                    android:text="ETH"
+                    android:textColor="#6F717A" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvUSD"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="215dp"
+                android:layout_alignParentEnd="true"
                 android:layout_marginTop="15dp"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/bg_layout_tv_grey"
                 android:text="USD"
                 android:textColor="#6F717A" />
+
+            </RelativeLayout>
         </FrameLayout>
 
         <androidx.constraintlayout.widget.Group
