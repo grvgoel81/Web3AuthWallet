@@ -444,7 +444,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                 solanaViewModel.signAndSendTransaction(
                     publicAddress, receiptAdd,
                     amount = Web3AuthUtils.getAmountInLamports(totalAmount.split(" ")[0]),
-                    /*intent.getStringExtra(DATA)*/"hello")
+                    intent.getStringExtra(DATA))
             } else {
                 ethereumViewModel.sendTransaction(
                     sessionID,

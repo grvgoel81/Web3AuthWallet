@@ -58,6 +58,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
+        init()
+    }
+
+    private fun showProgressDialog() {
+        progressDialog = ProgressDialog(this@MainActivity)
+        progressDialog.setMessage(getString(R.string.loading_balance))
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+    }
+
+    private fun init() {
         selectedNetwork =
             Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
                 .toString()
@@ -69,13 +80,14 @@ class MainActivity : AppCompatActivity() {
 
         showProgressDialog()
 
-        if(blockChain.contains(getString(R.string.solana))) {
+        if (blockChain.contains(getString(R.string.solana))) {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
             solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(blockChain), ed25519key)
             solanaViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
             solanaViewModel.getPublicAddress()
         } else {
             ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
+            ethereumViewModel.configureWeb3j(blockChain)
         }
 
         if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
@@ -87,13 +99,6 @@ class MainActivity : AppCompatActivity() {
         configureWeb3Auth()
         observeListeners()
         setUpListeners()
-    }
-
-    private fun showProgressDialog() {
-        progressDialog = ProgressDialog(this@MainActivity)
-        progressDialog.setMessage(getString(R.string.loading_balance))
-        progressDialog.setCancelable(false)
-        progressDialog.show()
     }
 
     private fun configureWeb3Auth() {
@@ -163,6 +168,8 @@ class MainActivity : AppCompatActivity() {
                 progressDialog.dismiss()
                 if (it > 0.0 && priceInUSD.isNotEmpty()) {
                     tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
+                } else {
+                    tvBalance.text = "0"
                 }
             }
         } else {
@@ -191,6 +198,8 @@ class MainActivity : AppCompatActivity() {
             solanaViewModel.balance.observe(this) {
                 if(it > 0) {
                     tvBalance.text = String.format("%.4f", it.roundOffLong())
+                } else {
+                    tvBalance.text = "0"
                 }
             }
             solanaViewModel.signature.observe(this) {
@@ -423,7 +432,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        getCurrencyInSelectedBlockChain()
+        init()
     }
 
     private fun logout() {

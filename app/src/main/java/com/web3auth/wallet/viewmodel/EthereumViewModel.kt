@@ -42,11 +42,11 @@ class EthereumViewModel : ViewModel() {
     var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
 
     init {
-        configureWeb3j(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "").toString())
+        //configureWeb3j(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "").toString())
         getMaxTransactionConfig()
     }
 
-    private fun configureWeb3j(blockChain: String) {
+    fun configureWeb3j(blockChain: String) {
         val url = NetworkUtils.getRpcUrl(blockChain)
         web3 = Web3j.build(HttpService(url))
         try {

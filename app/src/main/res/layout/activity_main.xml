@@ -81,7 +81,7 @@
         android:paddingStart="27dp"
         android:paddingEnd="27dp"
         android:paddingTop="20dp"
-        android:background="@color/activity_bg_color"
+        android:background="@color/background_color"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -222,11 +222,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvViewTransactionStatus"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/bg_button"
+                android:background="@drawable/bg_button_grey"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:text="@string/transfer_assets"
                 android:textAllCaps="false"
-                android:textColor="@color/white" />
+                android:textColor="@color/text_color" />
 
 
         </RelativeLayout>
@@ -279,11 +279,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/etMessage"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/bg_button"
+                android:background="@drawable/bg_button_grey"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:text="@string/sign_message"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="@color/sign_msg_txt_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

@@ -12,5 +12,8 @@
     <color name="line_separator_color">#D3D3D4</color>
     <color name="line_bg_color">#C4C4C4</color>
     <color name="text_color">#6F717A</color>
+    <color name="sign_msg_txt_color">#B7B8BD</color>
     <color name="light_grey">#D3D3D3</color>
+    <color name="background_color">#F3F3F4</color>
+    <color name="blockchain_settings_bg_color">#F9F9FB</color>
 </resources>
