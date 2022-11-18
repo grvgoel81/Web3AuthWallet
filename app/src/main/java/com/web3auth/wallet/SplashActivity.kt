@@ -6,6 +6,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.web3auth.wallet.utils.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class SplashActivity: AppCompatActivity() {
@@ -14,7 +17,10 @@ class SplashActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         supportActionBar?.hide()
-        Handler(Looper.getMainLooper()).postDelayed({ navigate() }, 500)
+        GlobalScope.launch {
+            delay(500)
+            navigate()
+        }
     }
 
     private fun navigate() {
