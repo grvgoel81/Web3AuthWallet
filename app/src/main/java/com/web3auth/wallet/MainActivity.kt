@@ -400,11 +400,6 @@ class MainActivity : AppCompatActivity() {
         toast("Text Copied")
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun showPopupOption(view: View) {
         val popupMenu = PopupMenu(this, view)

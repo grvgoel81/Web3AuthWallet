@@ -10,7 +10,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 class SplashActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
