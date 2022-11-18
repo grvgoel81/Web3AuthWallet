@@ -32,7 +32,6 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setUpSpinner() {
         spBlockChain.setText(blockChain)
-
         var blockchains = resources.getStringArray(R.array.blockchains)
         val adapter: ArrayAdapter<String> =
             ArrayAdapter(this, R.layout.item_dropdown, blockchains)
@@ -51,4 +50,5 @@ class SettingsActivity : AppCompatActivity() {
         }
         tvNetwork.text = blockChain
     }
+
 }

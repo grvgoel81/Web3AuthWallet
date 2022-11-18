@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.web3auth.wallet.api.ApiHelper
 import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.utils.MemoProgram
+import com.web3auth.wallet.utils.SingleLiveEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class SolanaViewModel: ViewModel() {
     var publicAddress = MutableLiveData("")
     var privateKey = MutableLiveData("")
     var balance = MutableLiveData(0L)
-    var signature = MutableLiveData("")
+    var signature = SingleLiveEvent<String?>()
     var sendTransactionResult = MutableLiveData(Pair(false, ""))
 
     fun setNetwork(cluster: Cluster, ed25519Key: String) {
@@ -58,7 +59,7 @@ class SolanaViewModel: ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     fun getBalance(publicAddress: String) {
         GlobalScope.launch {
-            balance.postValue(client.api.getBalance(PublicKey("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo")))
+            balance.postValue(client.api.getBalance(PublicKey(publicAddress)))
         }
     }
 

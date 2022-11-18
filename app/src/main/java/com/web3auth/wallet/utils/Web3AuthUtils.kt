@@ -21,8 +21,13 @@ object Web3AuthUtils {
 
     fun getBlockChainName(blockChain: String): String {
         return when (blockChain) {
-            "Ethereum" -> "EthAddress"
-            "Solana" -> "SolAddress"
+            "ETH Mainnet" -> "EthAddress"
+            "ETH Goerli" -> "EthAddress"
+            "Solana Testnet" -> "SolAddress"
+            "Solana Mainnet" -> "SolAddress"
+            "Solana Devnet" -> "SolAddress"
+            "Polygon Mainnet" -> "MATICAddress"
+            "Binance Mainnet" -> "BNBAddress"
             else -> "EthAddress"
         }
     }
@@ -61,7 +66,8 @@ object Web3AuthUtils {
 
     fun getTransactionStatusText(context: Context, blockChain: String): String {
         return when(blockChain) {
-            "Ethereum" -> context.getString(R.string.eth_view_transaction_status)
+            "ETH Mainnet" -> context.getString(R.string.eth_view_transaction_status)
+            "ETH Goerli" -> context.getString(R.string.eth_view_transaction_status)
             "Solana Mainnet" -> context.getString(R.string.sol_view_transaction_status)
             "Solana Testnet" -> context.getString(R.string.sol_view_transaction_status)
             "Solana Devnet" -> context.getString(R.string.sol_view_transaction_status)
@@ -133,9 +139,6 @@ object Web3AuthUtils {
                 "[\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]\uFE0F?)+")
         return  emojiRegex.containsMatchIn(input = message)
     }
-
-    fun getPriceInUSD(balance: Double, priceInUSD:Double): BigDecimal =
-        BigDecimal(balance).multiply(BigDecimal(priceInUSD))/getEtherInWei().toBigDecimal()
 
     fun getPriceinUSD(ethAmount: Double, usdPrice: Double): Double = ethAmount * (usdPrice)
 

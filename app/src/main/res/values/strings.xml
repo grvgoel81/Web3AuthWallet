@@ -10,6 +10,7 @@
     <string name="email">Email</string>
     <string name="address">Address</string>
     <string name="welcome">Welcome</string>
+    <string name="invalid_email">Invalid Email</string>
     <string name="account_details">Account Details</string>
     <string name="account_balance">Account Balance</string>
     <string name="transfer_assets">Transfer assets</string>
@@ -20,16 +21,19 @@
     <string name="send_to">Send to</string>
     <string name="select_item_transfer">Select item to transfer</string>
     <string name="sign_message">Sign Message</string>
+    <string name="web3j_connection_error">Error connecting to Web3j</string>
     <string name="amount">Amount</string>
     <string name="send_all">Send all</string>
     <string name="edit">Edit</string>
     <string name="max_transaction_fee">Max Transaction Fee</string>
     <string name="total_cost">Total cost</string>
     <string name="transfer">Transfer</string>
+    <string name="onboarding_error">OnBoardingError</string>
     <string name="transaction_placed">Transaction Placed</string>
     <string name="transaction_failed">Transaction Failed</string>
     <string name="transaction_success">Transaction Success</string>
     <string name="transaction_pending">Transaction Pending</string>
+    <string name="something_went_wrong">Something went wrong</string>
     <string name="try_again">Try again now</string>
     <string name="eth_view_transaction_status"><u>View transaction’s status on Etherscan</u></string>
     <string name="sol_view_transaction_status"><u>View transaction’s status on Solana Explorer</u></string>
@@ -38,7 +42,10 @@
     <string name="sol_transaction_status_url">https://explorer.solana.com/</string>
     <string name="sol_transaction_status_url_testnet">https://explorer.solana.com/?cluster=testnet</string>
     <string name="sol_transaction_status_url_devnet">https://explorer.solana.com/?cluster=devnet</string>
+    <string name="web3Auth_redirection_url">torusapp://org.torusresearch.web3authexample/redirect</string>
     <string name="sign_failed">Sign Failed</string>
+    <string name="wen3Auth_app_name">Web3Auth Sample App</string>
+    <string name="mainnet">Mainnet</string>
     <string name="sign_success">Sign Successfully</string>
     <string name="insufficient_balance">Insufficient Balance</string>
     <string name="copy"><u>Copy</u></string>
@@ -46,10 +53,13 @@
     <string name="amount_to_send">Amount to send</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="error">error</string>
+    <string name="denied_camera_permission">Cancelled due to missing camera permission</string>
     <string name="max_trans_dialog_heading">Select Max Transaction Fee Payable</string>
     <string name="max_trans_dialog_instruction">Your transaction will be prioritized by the network when you pay a higher fee</string>
     <string name="process_in_30sec">Process in ~ 30.0 seconds</string>
     <string name="process_in_90sec">Process in ~ 90.0 seconds</string>
+    <string name="cancelled">Cancelled</string>
     <string name="process_in">Process in ~</string>
     <string name="seconds">seconds</string>
     <string name="upto">Up to </string>

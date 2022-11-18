@@ -18,12 +18,14 @@ class SplashActivity: AppCompatActivity() {
     }
 
     private fun navigate() {
-        val loggedInFlag = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.get(ISLOGGEDIN, false)
-        val onboardedFlag = Web3AuthWalletApp.getContext()?.web3AuthWalletPreferences?.get(ISONBOARDED, false)
+        val loggedInFlag =
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(ISLOGGEDIN, false)
+        val onboardedFlag =
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(ISONBOARDED, false)
         var intent = Intent(this@SplashActivity, LoginActivity::class.java)
-        if(onboardedFlag == true) {
+        if(onboardedFlag) {
              intent = Intent(this@SplashActivity, MainActivity::class.java)
-        } else if(loggedInFlag == true) {
+        } else if(loggedInFlag) {
              intent = Intent(this@SplashActivity, OnBoardingActivity::class.java)
         }
         startActivity(intent)

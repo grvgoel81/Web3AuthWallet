@@ -28,16 +28,12 @@ import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
 import com.web3auth.wallet.viewmodel.SolanaViewModel
 import org.p2p.solanaj.core.PublicKey
-import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.methods.response.Web3ClientVersion
-import org.web3j.protocol.http.HttpService
 
 class TransferAssetsActivity : AppCompatActivity() {
 
     private lateinit var etRecipientAddress: AppCompatEditText
     private lateinit var etAmountToSend: AppCompatEditText
     private lateinit var etMaxTransFee: AppCompatEditText
-    private lateinit var web3: Web3j
     private lateinit var publicAddress: String
     private lateinit var ethGasAPIResponse: EthGasAPIResponse
     private lateinit var ethereumViewModel: EthereumViewModel
@@ -81,6 +77,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(blockChain), ed25519key)
         } else {
             ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
+            ethereumViewModel.configureWeb3j(blockChain)
             ethereumViewModel.getGasConfig()
         }
         setUpListeners()
@@ -217,19 +214,6 @@ class TransferAssetsActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureWeb3j() {
-        val url = "https://rpc-mumbai.maticvigil.com/" // Mainnet: https://mainnet.infura.io/v3/{}, 7f287687b3d049e2bea7b64869ee30a3
-        web3 = Web3j.build(HttpService(url))
-        try {
-            val clientVersion: Web3ClientVersion = web3.web3ClientVersion().sendAsync().get()
-            if (clientVersion.hasError()) {
-                toast("Error connecting to Web3j")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     private fun scanQRCode() {
         barcodeLauncher.launch(ScanOptions())
     }
@@ -238,7 +222,6 @@ class TransferAssetsActivity : AppCompatActivity() {
         if (result.second.isEmpty()) return
         if(::transDialog.isInitialized) transDialog.dismiss()
         if (result.first) {
-            println("transaction: ${result.second}")
             showTransactionDialog(TransactionStatus.SUCCESSFUL)
         } else {
             showTransactionDialog(TransactionStatus.FAILED)
@@ -251,11 +234,11 @@ class TransferAssetsActivity : AppCompatActivity() {
         if (result.contents == null) {
             val originalIntent = result.originalIntent
             if (originalIntent == null) {
-                Toast.makeText(this@TransferAssetsActivity, "Cancelled", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@TransferAssetsActivity, getString(R.string.cancelled), Toast.LENGTH_LONG).show()
             } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
                 Toast.makeText(
                     this@TransferAssetsActivity,
-                    "Cancelled due to missing camera permission",
+                    getString(R.string.denied_camera_permission),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -450,7 +433,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                     sessionID,
                     receiptAdd,
                     totalAmount.split(" ")[0].toDouble(),
-                    "",
+                    intent.getStringExtra(DATA),
                     selectedGasParams
                 )
             }

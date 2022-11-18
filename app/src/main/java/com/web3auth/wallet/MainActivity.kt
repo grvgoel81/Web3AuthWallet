@@ -70,9 +70,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         selectedNetwork =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, getString(R.string.mainnet))
                 .toString()
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "ETH Mainnet")
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, getString(R.string.ethereum))
             .toString()
         web3AuthResponse =
             Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getObject(LOGIN_RESPONSE)
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         if (blockChain.contains(getString(R.string.solana))) {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
             solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(blockChain), ed25519key)
-            solanaViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
+            solanaViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), getString(R.string.usd))
             solanaViewModel.getPublicAddress()
         } else {
             ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
@@ -107,9 +107,9 @@ class MainActivity : AppCompatActivity() {
                 context = this,
                 clientId = getString(R.string.web3auth_project_id),
                 network = NetworkUtils.getWebAuthNetwork(selectedNetwork),
-                redirectUrl = Uri.parse("torusapp://org.torusresearch.web3authexample/redirect"),
+                redirectUrl = Uri.parse(getString(R.string.web3Auth_redirection_url)),
                 whiteLabel = WhiteLabelData(
-                    "Web3Auth Sample App", null, null, "en", true,
+                    getString(R.string.wen3Auth_app_name), null, null, "en", true,
                     hashMapOf(
                         "primary" to "#123456"
                     )
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         if (!blockChain.contains(getString(R.string.solana))) {
             ethereumViewModel.isWeb3Configured.observe(this) {
                 if (it == false) {
-                    toast("Error connecting to Web3j")
+                    toast(getString(R.string.web3j_connection_error))
                 }
             }
 
@@ -165,16 +165,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             ethereumViewModel.balance.observe(this) { it ->
-                progressDialog.dismiss()
                 if (it > 0.0 && priceInUSD.isNotEmpty()) {
                     tvBalance.text = Web3AuthUtils.toWeiEther(it).roundOff()
                 } else {
                     tvBalance.text = "0"
                 }
+                progressDialog.dismiss()
             }
         } else {
             solanaViewModel.priceInUSD.observe(this) {
-                progressDialog.dismiss()
                 if (it != null && it.isNotEmpty()) {
                     priceInUSD = it
                     Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
@@ -182,6 +181,7 @@ class MainActivity : AppCompatActivity() {
                         "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
                             .plus(priceInUSD).plus(" " + getString(R.string.usd))
                 }
+                progressDialog.dismiss()
             }
             solanaViewModel.publicAddress.observe(this) {
                 if(it.isNotEmpty()) {
@@ -192,9 +192,7 @@ class MainActivity : AppCompatActivity() {
                     solanaViewModel.getBalance(publicAddress)
                 }
             }
-            solanaViewModel.privateKey.observe(this) {
-                println("Private Key: $it")
-            }
+            solanaViewModel.privateKey.observe(this) {}
             solanaViewModel.balance.observe(this) {
                 if(it > 0) {
                     tvBalance.text = String.format("%.4f", it.roundOffLong())
@@ -203,7 +201,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             solanaViewModel.signature.observe(this) {
-                if(it.isNotEmpty()) {
+                if(it?.isNotEmpty() == true) {
                     showSignatureResult(it)
                 }
             }
@@ -275,7 +273,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if(!blockChain.contains(getString(R.string.solana))) {
-            ethereumViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), "USD")
+            ethereumViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), getString(R.string.usd))
         }
     }
 
@@ -346,7 +344,7 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun showSignatureResult(signatureHash: String) {
-        if(signatureHash == "error") {
+        if(signatureHash == getString(R.string.error)) {
             showSignTransactionDialog(false)
         } else {
             showSignTransactionDialog(true, signatureHash)

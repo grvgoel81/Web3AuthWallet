@@ -1,6 +1,5 @@
 package com.web3auth.wallet
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -27,7 +26,6 @@ class OnBoardingActivity: AppCompatActivity() {
     private lateinit var web3Auth: Web3Auth
     private lateinit var selectedNetwork: String
     private lateinit var ivFullLogin: AppCompatImageView
-    private lateinit var context: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +71,9 @@ class OnBoardingActivity: AppCompatActivity() {
             Web3AuthOptions(context = this,
                 clientId = getString(R.string.web3auth_project_id),
                 network = NetworkUtils.getWebAuthNetwork(selectedNetwork),
-                redirectUrl = Uri.parse("torusapp://org.torusresearch.web3authexample/redirect"),
+                redirectUrl = Uri.parse(getString(R.string.web3Auth_redirection_url)),
                 whiteLabel = WhiteLabelData(
-                    "Web3Auth Sample App", null, null, "en", true,
+                    getString(R.string.wen3Auth_app_name), null, null, "en", true,
                     hashMapOf(
                         "primary" to "#123456"
                     )
@@ -93,7 +91,7 @@ class OnBoardingActivity: AppCompatActivity() {
         if (loginProvider == Provider.EMAIL_PASSWORDLESS) {
             val hintEmail = hintEmailEditText.text.toString()
             if (hintEmail.isBlank() || !hintEmail.isEmailValid()) {
-                Toast.makeText(this, "Please enter a valid Email.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_LONG).show()
                 return
             }
             extraLoginOptions = ExtraLoginOptions(login_hint = hintEmail)
@@ -111,7 +109,7 @@ class OnBoardingActivity: AppCompatActivity() {
                 startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
                 finish()
             } else {
-                Log.d("OnBoardingError", error.message ?: "Something went wrong" )
+                Log.d(getString(R.string.onboarding_error), error.message ?: getString(R.string.something_went_wrong) )
             }
         }
     }

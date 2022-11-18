@@ -42,7 +42,6 @@ class EthereumViewModel : ViewModel() {
     var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
 
     init {
-        //configureWeb3j(Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "").toString())
         getMaxTransactionConfig()
     }
 
