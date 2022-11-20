@@ -2,15 +2,12 @@ package com.web3auth.wallet.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.web3auth.wallet.Web3AuthWalletApp
 import com.web3auth.wallet.api.ApiHelper
 import com.web3auth.wallet.api.Web3AuthApi
 import com.web3auth.wallet.api.models.EthGasAPIResponse
 import com.web3auth.wallet.api.models.GasApiResponse
 import com.web3auth.wallet.api.models.Params
-import com.web3auth.wallet.utils.BLOCKCHAIN
 import com.web3auth.wallet.utils.NetworkUtils
-import com.web3auth.wallet.utils.web3AuthWalletPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -154,8 +151,9 @@ class EthereumViewModel : ViewModel() {
                 val signedMessage: ByteArray =
                     TransactionEncoder.signMessage(rawTransaction, credentials)
                 val hexValue: String = Numeric.toHexString(signedMessage)
-                val ethSendTransaction: EthSendTransaction = web3.ethSendRawTransaction(hexValue).send()
-                if(ethSendTransaction.error != null) {
+                val ethSendTransaction: EthSendTransaction =
+                    web3.ethSendRawTransaction(hexValue).send()
+                if (ethSendTransaction.error != null) {
                     transactionHash.postValue(Pair(false, ethSendTransaction.error.message))
                 } else {
                     transactionHash.postValue(Pair(true, ethSendTransaction.transactionHash))

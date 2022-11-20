@@ -18,7 +18,7 @@ import org.p2p.solanaj.rpc.RpcClient
 import org.p2p.solanaj.rpc.RpcException
 import java.nio.charset.StandardCharsets
 
-class SolanaViewModel: ViewModel() {
+class SolanaViewModel : ViewModel() {
 
     private lateinit var client: RpcClient
     private lateinit var account: org.p2p.solanaj.core.Account
@@ -68,7 +68,12 @@ class SolanaViewModel: ViewModel() {
         GlobalScope.launch {
             client = RpcClient(cluster)
             val transaction = Transaction()
-            transaction.addInstruction(MemoProgram.writeUtf8(PublicKey(account.publicKey.toBase58()), message))
+            transaction.addInstruction(
+                MemoProgram.writeUtf8(
+                    PublicKey(account.publicKey.toBase58()),
+                    message
+                )
+            )
             try {
                 signature.postValue(client.api.sendTransaction(transaction, account))
             } catch (ex: RpcException) {

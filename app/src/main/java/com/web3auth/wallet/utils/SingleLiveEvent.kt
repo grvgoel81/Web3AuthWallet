@@ -13,7 +13,8 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
 
-        if (hasActiveObservers()) { }
+        if (hasActiveObservers()) {
+        }
 
         // Observe the internal MutableLiveData
         super.observe(owner) { t ->

@@ -70,27 +70,38 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         selectedNetwork =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, getString(R.string.mainnet))
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+                NETWORK,
+                getString(R.string.mainnet)
+            )
                 .toString()
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, getString(R.string.ethereum))
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+            BLOCKCHAIN,
+            getString(R.string.ethereum)
+        )
             .toString()
         web3AuthResponse =
             Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getObject(LOGIN_RESPONSE)
-        ed25519key = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "").toString()
+        ed25519key =
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "")
+                .toString()
 
         showProgressDialog()
 
         if (blockChain.contains(getString(R.string.solana))) {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
             solanaViewModel.setNetwork(NetworkUtils.getSolanaNetwork(blockChain), ed25519key)
-            solanaViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), getString(R.string.usd))
+            solanaViewModel.getCurrencyPriceInUSD(
+                Web3AuthUtils.getCurrency(blockChain),
+                getString(R.string.usd)
+            )
             solanaViewModel.getPublicAddress()
         } else {
             ethereumViewModel = ViewModelProvider(this)[EthereumViewModel::class.java]
             ethereumViewModel.configureWeb3j(blockChain)
         }
 
-        if(!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
+        if (!Web3AuthUtils.isNetworkAvailable(this@MainActivity)) {
             progressDialog.dismiss()
             longToast(getString(R.string.connect_to_internet))
             return
@@ -109,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                 network = NetworkUtils.getWebAuthNetwork(selectedNetwork),
                 redirectUrl = Uri.parse(getString(R.string.web3Auth_redirection_url)),
                 whiteLabel = WhiteLabelData(
-                    getString(R.string.wen3Auth_app_name), null, null, "en", true,
+                    getString(R.string.web3Auth_app_name), null, null, "en", true,
                     hashMapOf(
                         "primary" to "#123456"
                     )
@@ -118,17 +129,19 @@ class MainActivity : AppCompatActivity() {
         ).also { web3Auth = it }
         web3Auth.setResultUrl(intent.data)
 
-        if(!blockChain.contains(getString(R.string.solana))) {
+        if (!blockChain.contains(getString(R.string.solana))) {
             ethereumViewModel.getPublicAddress(web3AuthResponse?.sessionId.toString())
         }
 
-        findViewById<AppCompatTextView>(R.id.tvName).text = getString(R.string.welcome).plus(" ").plus(
-            web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
-        ).plus("!")
-        
+        findViewById<AppCompatTextView>(R.id.tvName).text =
+            getString(R.string.welcome).plus(" ").plus(
+                web3AuthResponse?.userInfo?.name?.split(" ")?.get(0)
+            ).plus("!")
+
         val tvEmail = findViewById<AppCompatTextView>(R.id.tvEmail)
         tvEmail.text = web3AuthResponse?.userInfo?.email
-        val loginType = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(LOGINTYPE, "")
+        val loginType =
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(LOGINTYPE, "")
         tvEmail.addLeftDrawable(Web3AuthUtils.getSocialLoginIcon(this, loginType.toString()))
         setData()
     }
@@ -144,7 +157,8 @@ class MainActivity : AppCompatActivity() {
             ethereumViewModel.priceInUSD.observe(this) {
                 if (!it.isNullOrEmpty()) {
                     priceInUSD = it
-                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
+                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] =
+                        priceInUSD
                     tvExchangeRate.text =
                         "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
                             .plus(priceInUSD).plus(" " + getString(R.string.usd))
@@ -176,7 +190,8 @@ class MainActivity : AppCompatActivity() {
             solanaViewModel.priceInUSD.observe(this) {
                 if (it != null && it.isNotEmpty()) {
                     priceInUSD = it
-                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] = priceInUSD
+                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] =
+                        priceInUSD
                     tvExchangeRate.text =
                         "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
                             .plus(priceInUSD).plus(" " + getString(R.string.usd))
@@ -184,24 +199,25 @@ class MainActivity : AppCompatActivity() {
                 progressDialog.dismiss()
             }
             solanaViewModel.publicAddress.observe(this) {
-                if(it.isNotEmpty()) {
+                if (it.isNotEmpty()) {
                     publicAddress = it
                     findViewById<AppCompatTextView>(R.id.tvAddress).text =
                         publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
+                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] =
+                        publicAddress
                     solanaViewModel.getBalance(publicAddress)
                 }
             }
             solanaViewModel.privateKey.observe(this) {}
             solanaViewModel.balance.observe(this) {
-                if(it > 0) {
+                if (it > 0) {
                     tvBalance.text = String.format("%.4f", it.roundOffLong())
                 } else {
                     tvBalance.text = "0"
                 }
             }
             solanaViewModel.signature.observe(this) {
-                if(it?.isNotEmpty() == true) {
+                if (it?.isNotEmpty() == true) {
                     showSignatureResult(it)
                 }
             }
@@ -214,20 +230,21 @@ class MainActivity : AppCompatActivity() {
         btnSign = findViewById(R.id.btnSign)
         tvBalance = findViewById(R.id.tvBalance)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
-            if(tvBalance.text.toString().toDouble().compareTo(0.0) == 0)  {
+            if (tvBalance.text.toString().toDouble().compareTo(0.0) == 0) {
                 toast(getString(R.string.insufficient_balance))
                 return@setOnClickListener
             }
             val intent = Intent(this@MainActivity, TransferAssetsActivity::class.java)
-            if(etMessage.text.toString().trim().isNotEmpty()) {
+            if (etMessage.text.toString().trim().isNotEmpty()) {
                 intent.putExtra(DATA, etMessage.text.toString())
             }
             startActivity(intent)
         }
         var ivLogout = findViewById<AppCompatImageView>(R.id.ivLogout)
-        ivLogout.setOnClickListener { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            showPopupOption(ivLogout)
-        }
+        ivLogout.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                showPopupOption(ivLogout)
+            }
         }
         findViewById<AppCompatTextView>(R.id.tvLogout).setOnClickListener { logout() }
         findViewById<AppCompatImageView>(R.id.ivQRCode).setOnClickListener {
@@ -236,17 +253,18 @@ class MainActivity : AppCompatActivity() {
 
         btnSign.setOnClickListener {
             val msg = etMessage.text.toString()
-            if(msg.isEmpty() || Web3AuthUtils.containsEmoji(etMessage.text.toString())) {
+            if (msg.isEmpty() || Web3AuthUtils.containsEmoji(etMessage.text.toString())) {
                 toast(getString(R.string.invalid_message))
                 return@setOnClickListener
             }
-            
-            if(blockChain.contains(getString(R.string.solana))) {
+
+            if (blockChain.contains(getString(R.string.solana))) {
                 solanaViewModel.signTransaction(NetworkUtils.getSolanaNetwork(blockChain), msg)
             } else {
                 val signatureHash = ethereumViewModel.getSignature(
                     web3AuthResponse?.sessionId.toString(),
-                    msg)
+                    msg
+                )
                 showSignatureResult(signatureHash)
             }
         }
@@ -266,14 +284,20 @@ class MainActivity : AppCompatActivity() {
         tvViewTransactionStatus = findViewById(R.id.tvViewTransactionStatus)
         tvViewTransactionStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
         tvViewTransactionStatus.setOnClickListener {
-            Web3AuthUtils.openCustomTabs(this@MainActivity, Web3AuthUtils.getViewTransactionUrl(this, blockChain))
+            Web3AuthUtils.openCustomTabs(
+                this@MainActivity,
+                Web3AuthUtils.getViewTransactionUrl(this, blockChain)
+            )
         }
         tvNetwork.setOnClickListener {
             navigateToSettings()
         }
 
-        if(!blockChain.contains(getString(R.string.solana))) {
-            ethereumViewModel.getCurrencyPriceInUSD(Web3AuthUtils.getCurrency(blockChain), getString(R.string.usd))
+        if (!blockChain.contains(getString(R.string.solana))) {
+            ethereumViewModel.getCurrencyPriceInUSD(
+                Web3AuthUtils.getCurrency(blockChain),
+                getString(R.string.usd)
+            )
         }
     }
 
@@ -286,14 +310,20 @@ class MainActivity : AppCompatActivity() {
         spCurrency.adapter = currencyAdapter
         spCurrency.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                if(tvBalance.text.toString().toDouble().compareTo(0.0) == 0)  return
-                if(currencies[position] == getString(R.string.usd)) {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                if (tvBalance.text.toString().toDouble().compareTo(0.0) == 0) return
+                if (currencies[position] == getString(R.string.usd)) {
                     getCurrencyInUSD()
                 } else {
                     getCurrencyInSelectedBlockChain()
                 }
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
@@ -336,15 +366,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrencyInUSD() {
-        if(blockChain.contains(getString(R.string.solana))) {
-            tvBalance.text = String.format("%.4f", Web3AuthUtils.getPriceinUSD(tvBalance.text.toString().toDouble(), priceInUSD.toDouble()))
+        if (blockChain.contains(getString(R.string.solana))) {
+            tvBalance.text = String.format(
+                "%.4f",
+                Web3AuthUtils.getPriceinUSD(
+                    tvBalance.text.toString().toDouble(),
+                    priceInUSD.toDouble()
+                )
+            )
         } else {
-            tvBalance.text = String.format("%.6f", Web3AuthUtils.getPriceinUSD(tvBalance.text.toString().toDouble(), priceInUSD.toDouble()))
+            tvBalance.text = String.format(
+                "%.6f",
+                Web3AuthUtils.getPriceinUSD(
+                    tvBalance.text.toString().toDouble(),
+                    priceInUSD.toDouble()
+                )
+            )
         }
     }
-    
+
     private fun showSignatureResult(signatureHash: String) {
-        if(signatureHash == getString(R.string.error)) {
+        if (signatureHash == getString(R.string.error)) {
             showSignTransactionDialog(false)
         } else {
             showSignTransactionDialog(true, signatureHash)
@@ -386,7 +428,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrencyInSelectedBlockChain() {
-        if(blockChain.contains(getString(R.string.solana))) {
+        if (blockChain.contains(getString(R.string.solana))) {
             solanaViewModel.getBalance(publicAddress)
         } else {
             ethereumViewModel.retrieveBalance(publicAddress)
@@ -403,7 +445,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun showPopupOption(view: View) {
         val popupMenu = PopupMenu(this, view)
-        popupMenu.menuInflater.inflate(R.menu.main,popupMenu.menu)
+        popupMenu.menuInflater.inflate(R.menu.main, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.settings -> {
@@ -429,12 +471,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logout() {
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISLOGGEDIN] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGOUT] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences.edit().clear().apply()
-        val intent = Intent(this@MainActivity, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGOUT] = true
+        startActivity(Intent(this, OnBoardingActivity::class.java))
+        finish()
     }
 }

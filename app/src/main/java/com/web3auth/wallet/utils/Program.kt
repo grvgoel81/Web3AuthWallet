@@ -12,7 +12,11 @@ open class Program {
      * @param data byte array sent to Solana
      * @return [TransactionInstruction] object containing specified values
      */
-    fun createTransactionInstruction(programId: PublicKey, keys: List<AccountMeta>, data: ByteArray): TransactionInstruction {
+    fun createTransactionInstruction(
+        programId: PublicKey,
+        keys: List<AccountMeta>,
+        data: ByteArray
+    ): TransactionInstruction {
         return TransactionInstruction(programId, keys, data)
     }
 }

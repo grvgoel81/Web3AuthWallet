@@ -2,15 +2,16 @@ package com.web3auth.wallet
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.web3auth.wallet.utils.*
+import com.web3auth.wallet.utils.ISLOGGEDIN
+import com.web3auth.wallet.utils.ISONBOARDED
+import com.web3auth.wallet.utils.get
+import com.web3auth.wallet.utils.web3AuthWalletPreferences
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SplashActivity: AppCompatActivity() {
+class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +29,10 @@ class SplashActivity: AppCompatActivity() {
         val onboardedFlag =
             Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(ISONBOARDED, false)
         var intent = Intent(this@SplashActivity, LoginActivity::class.java)
-        if(onboardedFlag) {
-             intent = Intent(this@SplashActivity, MainActivity::class.java)
-        } else if(loggedInFlag) {
-             intent = Intent(this@SplashActivity, OnBoardingActivity::class.java)
+        if (onboardedFlag) {
+            intent = Intent(this@SplashActivity, MainActivity::class.java)
+        } else if (loggedInFlag) {
+            intent = Intent(this@SplashActivity, OnBoardingActivity::class.java)
         }
         startActivity(intent)
         finish()

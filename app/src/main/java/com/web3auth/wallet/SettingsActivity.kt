@@ -3,7 +3,6 @@ package com.web3auth.wallet
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -24,8 +23,13 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         supportActionBar?.hide()
 
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(BLOCKCHAIN, "ETH Mainnet").toString()
-        network = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet").toString()
+        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+            BLOCKCHAIN,
+            "ETH Mainnet"
+        ).toString()
+        network =
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
+                .toString()
         setData()
         setUpSpinner()
     }
@@ -37,7 +41,8 @@ class SettingsActivity : AppCompatActivity() {
             ArrayAdapter(this, R.layout.item_dropdown, blockchains)
         spBlockChain.setAdapter(adapter)
         spBlockChain.setOnItemClickListener { _, _, position, _ ->
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] = blockchains[position]
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] =
+                blockchains[position]
             tvNetwork.text = blockchains[position]
         }
     }

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.web3auth.wallet.utils.*
 
-class LoginActivity: AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var networkSpinner: AutoCompleteTextView
     private lateinit var blockChainSpinner: AutoCompleteTextView
@@ -44,7 +44,8 @@ class LoginActivity: AppCompatActivity() {
             ArrayAdapter(this, R.layout.item_dropdown, blockchains)
         blockChainSpinner.setAdapter(adapter)
         blockChainSpinner.setOnItemClickListener { _, _, position, _ ->
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] = blockchains[position]
+            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] =
+                blockchains[position]
         }
     }
 }

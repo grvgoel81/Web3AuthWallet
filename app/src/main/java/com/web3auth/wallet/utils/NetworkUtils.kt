@@ -7,28 +7,28 @@ import org.torusresearch.fetchnodedetails.types.TorusNetwork
 object NetworkUtils {
 
     fun getWebAuthNetwork(network: String): Web3Auth.Network {
-        return when(network) {
+        return when (network) {
             "Mainnet" -> Web3Auth.Network.MAINNET
             "Testnet" -> Web3Auth.Network.TESTNET
             "Cyan" -> Web3Auth.Network.CYAN
-            else  -> Web3Auth.Network.MAINNET
+            else -> Web3Auth.Network.MAINNET
         }
     }
 
     fun getTorusNetwork(network: String): TorusNetwork {
-        return when(network) {
+        return when (network) {
             "Mainnet" -> TorusNetwork.MAINNET
             "Testnet" -> TorusNetwork.TESTNET
-            else  -> TorusNetwork.MAINNET
+            else -> TorusNetwork.MAINNET
         }
     }
 
-    fun getSolanaNetwork(network:String): Cluster {
-        return when(network) {
+    fun getSolanaNetwork(network: String): Cluster {
+        return when (network) {
             "Solana Mainnet" -> Cluster.MAINNET
             "Solana Testnet" -> Cluster.TESTNET
             "Solana Devnet" -> Cluster.DEVNET
-            else  -> Cluster.MAINNET
+            else -> Cluster.MAINNET
         }
     }
 

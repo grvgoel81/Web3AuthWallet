@@ -44,7 +44,7 @@
     <string name="sol_transaction_status_url_devnet">https://explorer.solana.com/?cluster=devnet</string>
     <string name="web3Auth_redirection_url">torusapp://org.torusresearch.web3authexample/redirect</string>
     <string name="sign_failed">Sign Failed</string>
-    <string name="wen3Auth_app_name">Web3Auth Sample App</string>
+    <string name="web3Auth_app_name">Web3Auth Sample App</string>
     <string name="mainnet">Mainnet</string>
     <string name="sign_success">Sign Successfully</string>
     <string name="insufficient_balance">Insufficient Balance</string>

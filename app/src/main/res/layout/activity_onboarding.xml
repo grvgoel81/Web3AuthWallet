@@ -13,6 +13,7 @@
         app:layout_constraintGuide_percent="0.15" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clHeader"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -56,6 +57,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clBody"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/activity_bg_color"
@@ -292,5 +294,11 @@
             app:layout_constraintTop_toBottomOf="@+id/etEmail"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

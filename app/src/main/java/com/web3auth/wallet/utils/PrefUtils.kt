@@ -83,7 +83,8 @@ fun View.show() {
 
 fun Double.roundOff(): String = String.format("%.4f", this)
 
-fun Long.roundOffLong(): BigDecimal = BigDecimal(this.div(10.0.pow(9))).setScale(2, RoundingMode.HALF_UP)
+fun Long.roundOffLong(): BigDecimal =
+    BigDecimal(this.div(10.0.pow(9))).setScale(2, RoundingMode.HALF_UP)
 
 fun View.hide() {
     this.visibility = View.GONE
@@ -104,7 +105,7 @@ enum class TransactionStatus {
 
 const val NETWORK = "network"
 const val BLOCKCHAIN = "blockchain"
-const val LOGIN_RESPONSE= "login-response"
+const val LOGIN_RESPONSE = "login-response"
 const val SESSION_ID = "sessionId"
 const val ED25519Key = "ed25519Key"
 const val ISLOGGEDIN = "isLoggedIn"
