@@ -95,7 +95,7 @@
     <string-array name="networks">
         <item>Mainnet</item>
         <item>Testnet</item>
-        <item>Devnet</item>
+        <item>Cyan</item>
     </string-array>
 
     <string-array name="blockchains">
