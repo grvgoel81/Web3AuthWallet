@@ -25,9 +25,9 @@ class SplashActivity : AppCompatActivity() {
 
     private fun navigate() {
         val loggedInFlag =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(ISLOGGEDIN, false)
+            this.applicationContext.web3AuthWalletPreferences.get(ISLOGGEDIN, false)
         val onboardedFlag =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.get(ISONBOARDED, false)
+            this.applicationContext.web3AuthWalletPreferences.get(ISONBOARDED, false)
         var intent = Intent(this@SplashActivity, LoginActivity::class.java)
         if (onboardedFlag) {
             intent = Intent(this@SplashActivity, MainActivity::class.java)

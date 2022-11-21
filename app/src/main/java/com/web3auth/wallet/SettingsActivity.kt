@@ -23,12 +23,12 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         supportActionBar?.hide()
 
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+        blockChain = this.applicationContext.web3AuthWalletPreferences.getString(
             BLOCKCHAIN,
             "ETH Mainnet"
         ).toString()
         network =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
+            this.applicationContext.web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
                 .toString()
         setData()
         setUpSpinner()
@@ -41,7 +41,7 @@ class SettingsActivity : AppCompatActivity() {
             ArrayAdapter(this, R.layout.item_dropdown, blockchains)
         spBlockChain.setAdapter(adapter)
         spBlockChain.setOnItemClickListener { _, _, position, _ ->
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences[BLOCKCHAIN] =
+            this.applicationContext.web3AuthWalletPreferences[BLOCKCHAIN] =
                 blockchains[position]
             tvNetwork.text = blockchains[position]
         }

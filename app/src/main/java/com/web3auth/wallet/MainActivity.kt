@@ -36,12 +36,12 @@ import com.web3auth.wallet.viewmodel.SolanaViewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var web3Auth: Web3Auth
     private var web3AuthResponse: Web3AuthResponse? = null
     private lateinit var blockChain: String
     private lateinit var publicAddress: String
     private lateinit var selectedNetwork: String
     private lateinit var ed25519key: String
+    private lateinit var sessionID: String
     private lateinit var tvExchangeRate: AppCompatTextView
     private lateinit var tvViewTransactionStatus: AppCompatTextView
     private lateinit var spCurrency: Spinner
@@ -72,20 +72,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         selectedNetwork =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+            this.applicationContext.web3AuthWalletPreferences.getString(
                 NETWORK,
                 getString(R.string.mainnet)
             )
                 .toString()
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+        blockChain = this.applicationContext.web3AuthWalletPreferences.getString(
             BLOCKCHAIN,
             getString(R.string.ethereum)
-        )
-            .toString()
+        ).toString()
+        sessionID =
+            this.applicationContext.web3AuthWalletPreferences.getString(SESSION_ID, "")
+                .toString()
         web3AuthResponse =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getObject(LOGIN_RESPONSE)
+            this.applicationContext.web3AuthWalletPreferences.getObject(LOGIN_RESPONSE)
         ed25519key =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(ED25519Key, "")
                 .toString()
 
         showProgressDialog()
@@ -115,24 +117,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureWeb3Auth() {
-        Web3Auth(
-            Web3AuthOptions(
-                context = this,
-                clientId = getString(R.string.web3auth_project_id),
-                network = NetworkUtils.getWebAuthNetwork(selectedNetwork),
-                redirectUrl = Uri.parse(getString(R.string.web3Auth_redirection_url)),
-                whiteLabel = WhiteLabelData(
-                    getString(R.string.web3Auth_app_name), null, null, "en", true,
-                    hashMapOf(
-                        "primary" to "#123456"
-                    )
-                )
-            )
-        ).also { web3Auth = it }
-        web3Auth.setResultUrl(intent.data)
-
         if (!blockChain.contains(getString(R.string.solana))) {
-            ethereumViewModel.getPublicAddress(web3AuthResponse?.sessionId.toString())
+            ethereumViewModel.getPublicAddress(sessionID)
         }
 
         findViewById<AppCompatTextView>(R.id.tvName).text =
@@ -143,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         val tvEmail = findViewById<AppCompatTextView>(R.id.tvEmail)
         tvEmail.text = web3AuthResponse?.userInfo?.email
         val loginType =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(LOGINTYPE, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(LOGINTYPE, "")
         tvEmail.addLeftDrawable(Web3AuthUtils.getSocialLoginIcon(this, loginType.toString()))
         setData()
     }
@@ -159,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             ethereumViewModel.priceInUSD.observe(this) {
                 if (!it.isNullOrEmpty()) {
                     priceInUSD = it
-                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] =
+                    this.applicationContext.web3AuthWalletPreferences[PRICE_IN_USD] =
                         priceInUSD
                     tvExchangeRate.text =
                         "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
@@ -175,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                 publicAddress = it
                 findViewById<AppCompatTextView>(R.id.tvAddress).text =
                     publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] = publicAddress
+                this.applicationContext.web3AuthWalletPreferences[PUBLICKEY] = publicAddress
                 if (publicAddress.isNotEmpty()) {
                     ethereumViewModel.retrieveBalance(publicAddress)
                 }
@@ -194,7 +180,7 @@ class MainActivity : AppCompatActivity() {
             solanaViewModel.priceInUSD.observe(this) {
                 if (it != null && it.isNotEmpty()) {
                     priceInUSD = it
-                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PRICE_IN_USD] =
+                    this.applicationContext.web3AuthWalletPreferences[PRICE_IN_USD] =
                         priceInUSD
                     tvExchangeRate.text =
                         "1 ".plus(Web3AuthUtils.getCurrency(blockChain)).plus(" = ")
@@ -208,7 +194,7 @@ class MainActivity : AppCompatActivity() {
                     publicAddress = it
                     findViewById<AppCompatTextView>(R.id.tvAddress).text =
                         publicAddress.take(3).plus("...").plus(publicAddress.takeLast(4))
-                    Web3AuthWalletApp.getContext().web3AuthWalletPreferences[PUBLICKEY] =
+                    this.applicationContext.web3AuthWalletPreferences[PUBLICKEY] =
                         publicAddress
                     solanaViewModel.getBalance(publicAddress)
                 }
@@ -248,7 +234,7 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        var ivLogout = findViewById<AppCompatImageView>(R.id.ivLogout)
+        val ivLogout = findViewById<AppCompatImageView>(R.id.ivLogout)
         ivLogout.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 showPopupOption(ivLogout)
@@ -276,11 +262,6 @@ class MainActivity : AppCompatActivity() {
                 showSignatureResult(signatureHash)
             }
         }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        web3Auth.setResultUrl(intent?.data)
     }
 
     private fun setData() {
@@ -501,10 +482,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logout() {
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISLOGGEDIN] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGOUT] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences.edit().clear().apply()
+        this.applicationContext.web3AuthWalletPreferences[ISLOGGEDIN] = false
+        this.applicationContext.web3AuthWalletPreferences[ISONBOARDED] = false
+        this.applicationContext.web3AuthWalletPreferences[LOGOUT] = false
         val intent = Intent(this@MainActivity, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)

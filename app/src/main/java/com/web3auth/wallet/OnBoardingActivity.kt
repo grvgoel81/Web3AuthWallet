@@ -28,10 +28,6 @@ class OnBoardingActivity : AppCompatActivity() {
     private lateinit var web3Auth: Web3Auth
     private lateinit var selectedNetwork: String
     private lateinit var ivFullLogin: AppCompatImageView
-    private lateinit var clHeader: ConstraintLayout
-    private lateinit var clBody: ConstraintLayout
-    private lateinit var progessBar: ProgressBar
-    private var logoutFlag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,7 +133,7 @@ class OnBoardingActivity : AppCompatActivity() {
 
     private fun configureWeb3Auth() {
         selectedNetwork =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(NETWORK, "")
                 .toString()
         web3Auth = Web3Auth(
             Web3AuthOptions(
@@ -155,10 +151,28 @@ class OnBoardingActivity : AppCompatActivity() {
         )
 
         web3Auth.setResultUrl(intent.data)
+
+        val sessionResponse: CompletableFuture<Web3AuthResponse> = web3Auth.sessionResponse()
+        print("SESSION MANAGEMENT");
+        print(sessionResponse);
+        sessionResponse.whenComplete { loginResponse, error ->
+            if (error == null) {
+                print("LOGIN RESPONSE $loginResponse")
+                this.applicationContext.web3AuthWalletPreferences[LOGIN_RESPONSE] =
+                    loginResponse
+                this.applicationContext.web3AuthWalletPreferences[ED25519Key] =
+                    loginResponse.ed25519PrivKey.toString()
+                this.applicationContext.web3AuthWalletPreferences[ISONBOARDED] = true
+                startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
+                finish()
+            } else {
+                Log.d("MainActivity_Web3Auth", error.message ?: "Something went wrong")
+            }
+        }
     }
 
     private fun signIn(loginProvider: Provider = Provider.GOOGLE, loginType: String) {
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[loginType] = loginType
+        this.applicationContext.web3AuthWalletPreferences[loginType] = loginType
         val hintEmailEditText = findViewById<AppCompatEditText>(R.id.etEmail)
         var extraLoginOptions: ExtraLoginOptions? = null
         if (loginProvider == Provider.EMAIL_PASSWORDLESS) {
@@ -175,13 +189,14 @@ class OnBoardingActivity : AppCompatActivity() {
         )
         loginCompletableFuture.whenComplete { loginResponse, error ->
             if (error == null) {
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGIN_RESPONSE] =
+                println("LOGIN RESPONSE $loginResponse")
+                this.applicationContext.web3AuthWalletPreferences[LOGIN_RESPONSE] =
                     loginResponse
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ED25519Key] =
+                this.applicationContext.web3AuthWalletPreferences[ED25519Key] =
                     loginResponse.ed25519PrivKey.toString()
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[SESSION_ID] =
+                this.applicationContext.web3AuthWalletPreferences[SESSION_ID] =
                     loginResponse.sessionId.toString()
-                Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = true
+                this.applicationContext.web3AuthWalletPreferences[ISONBOARDED] = true
                 startActivity(Intent(this@OnBoardingActivity, MainActivity::class.java))
                 finish()
             } else {

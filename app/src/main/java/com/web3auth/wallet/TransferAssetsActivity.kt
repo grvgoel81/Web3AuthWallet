@@ -66,24 +66,24 @@ class TransferAssetsActivity : AppCompatActivity() {
             longToast(getString(R.string.connect_to_internet))
             return
         }
-        blockChain = Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(
+        blockChain = this.applicationContext.web3AuthWalletPreferences.getString(
             BLOCKCHAIN,
             "ETH Mainnet"
         ).toString()
         network =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
+            this.applicationContext.web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
                 .toString()
         publicAddress =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PUBLICKEY, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(PUBLICKEY, "")
                 .toString()
         sessionID =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(SESSION_ID, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(SESSION_ID, "")
                 .toString()
         priceInUSD =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(PRICE_IN_USD, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(PRICE_IN_USD, "")
                 .toString()
         ed25519key =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getString(ED25519Key, "")
+            this.applicationContext.web3AuthWalletPreferences.getString(ED25519Key, "")
                 .toString()
         if (blockChain.contains(getString(R.string.solana))) {
             solanaViewModel = ViewModelProvider(this)[SolanaViewModel::class.java]
@@ -441,7 +441,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             )
         )
             .plus(" ").plus(getString(R.string.usd))
-        tvNetwork.text = blockChain.plus(" ").plus(network)
+        tvNetwork.text = blockChain
 
         if (blockChain.contains(getString(R.string.solana)))
             tvTransactionValue.text = "0.000005".plus(" " + Web3AuthUtils.getCurrency(blockChain))
