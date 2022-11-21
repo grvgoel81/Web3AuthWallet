@@ -174,7 +174,7 @@
                 android:layout_below="@+id/tvNetwork"
                 android:layout_centerHorizontal="true"
                 android:inputType="none"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="14dp"
                 android:layout_toRightOf="@+id/tvBalance"
                 android:text="Eth"
                 android:layout_gravity="left"
@@ -197,11 +197,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
-                tools:text="= 0.012 USD"
-                android:visibility="gone"
+                tools:text="= 0.00 USD"
+                android:visibility="visible"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/tvNetwork"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvViewTransactionStatus"

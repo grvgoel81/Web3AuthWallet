@@ -44,17 +44,6 @@ class OnBoardingActivity : AppCompatActivity() {
 
     private fun setUpListeners() {
         val rlSocialLogins = findViewById<RelativeLayout>(R.id.rlSocialLogins)
-        clBody = findViewById(R.id.clBody)
-        clHeader = findViewById(R.id.clHeader)
-        progessBar = findViewById(R.id.progressBar)
-        logoutFlag =
-            Web3AuthWalletApp.getContext().web3AuthWalletPreferences.getBoolean(LOGOUT, false)
-        if (logoutFlag) {
-            clBody.hide()
-            clHeader.hide()
-            progessBar.show()
-            logout()
-        }
         ivFullLogin = findViewById(R.id.ivFullLogin)
         ivFullLogin.setOnClickListener {
             expandFlag = if (expandFlag) {
@@ -204,27 +193,10 @@ class OnBoardingActivity : AppCompatActivity() {
         }
     }
 
-    private fun logout() {
-        val logoutCompletableFuture = web3Auth.logout()
-        logoutCompletableFuture.whenComplete { _, error ->
-            if (error == null) {
-                onLogout()
-            } else {
-                Log.d(
-                    "MainActivity_Web3Auth",
-                    error.message ?: getString(R.string.something_went_wrong)
-                )
-            }
-        }
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         // Handle user signing in when app is active
         web3Auth.setResultUrl(intent?.data)
-        if (logoutFlag) {
-            onLogout()
-        }
     }
 
     private fun expand(v: View) {
@@ -255,17 +227,6 @@ class OnBoardingActivity : AppCompatActivity() {
         a.duration = (targetHeight / v.context.resources.displayMetrics.density).toInt().toLong()
         v.startAnimation(a)
         ivFullLogin.setImageDrawable(getDrawable(R.drawable.ic_collapse_arrow))
-    }
-
-    private fun onLogout() {
-        progessBar.hide()
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISLOGGEDIN] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[ISONBOARDED] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences[LOGOUT] = false
-        Web3AuthWalletApp.getContext().web3AuthWalletPreferences.edit().clear().apply()
-        val intent = Intent(this@OnBoardingActivity, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
     }
 
     private fun collapse(v: View) {

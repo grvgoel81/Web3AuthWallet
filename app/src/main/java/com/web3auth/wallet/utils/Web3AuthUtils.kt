@@ -62,12 +62,13 @@ object Web3AuthUtils {
 
     fun getTransactionStatusText(context: Context, blockChain: String): String {
         return when (blockChain) {
-            "ETH Mainnet" -> context.getString(R.string.eth_view_transaction_status)
-            "ETH Goerli" -> context.getString(R.string.eth_view_transaction_status)
-            "Solana Mainnet" -> context.getString(R.string.sol_view_transaction_status)
-            "Solana Testnet" -> context.getString(R.string.sol_view_transaction_status)
-            "Solana Devnet" -> context.getString(R.string.sol_view_transaction_status)
-            else -> context.getString(R.string.eth_view_transaction_status)
+            "ETH Mainnet" -> context.getString(R.string.eth_view_account)
+            "ETH Goerli" -> context.getString(R.string.eth_view_account)
+            "Solana Mainnet" -> context.getString(R.string.sol_view_account)
+            "Solana Testnet" -> context.getString(R.string.sol_view_account)
+            "Solana Devnet" -> context.getString(R.string.sol_view_account)
+            "Polygon Mainnet" -> context.getString(R.string.poly_view_account)
+            else -> context.getString(R.string.eth_view_account)
         }
     }
 

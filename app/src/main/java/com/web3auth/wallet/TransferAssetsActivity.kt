@@ -236,7 +236,9 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun scanQRCode() {
-        barcodeLauncher.launch(ScanOptions())
+        val options = ScanOptions()
+        options.setOrientationLocked(true)
+        barcodeLauncher.launch(options)
     }
 
     private fun observeTransactionResult(result: Pair<Boolean, String>) {
