@@ -271,11 +271,17 @@ class MainActivity : AppCompatActivity() {
         setUpSpinner()
 
         tvViewTransactionStatus = findViewById(R.id.tvViewTransactionStatus)
-        tvViewTransactionStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
+        tvViewTransactionStatus.text = Web3AuthUtils.getAccountViewText(this, blockChain)
         tvViewTransactionStatus.setOnClickListener {
+            var accountUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain).plus("address/").plus(publicAddress)
+            if(blockChain == getString(R.string.sol_testnet)) {
+                accountUrl = accountUrl.plus("?cluster=testnet")
+            } else if(blockChain == getString(R.string.sol_devnet)) {
+                accountUrl = accountUrl.plus("?cluster=devnet")
+            }
             Web3AuthUtils.openCustomTabs(
                 this@MainActivity,
-                Web3AuthUtils.getViewTransactionUrl(this, blockChain)
+                accountUrl
             )
         }
         tvNetwork.setOnClickListener {

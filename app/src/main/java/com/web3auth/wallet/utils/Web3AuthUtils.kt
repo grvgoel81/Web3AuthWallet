@@ -60,7 +60,7 @@ object Web3AuthUtils {
         return false
     }
 
-    fun getTransactionStatusText(context: Context, blockChain: String): String {
+    fun getAccountViewText(context: Context, blockChain: String): String {
         return when (blockChain) {
             "ETH Mainnet" -> context.getString(R.string.eth_view_account)
             "ETH Goerli" -> context.getString(R.string.eth_view_account)
@@ -69,6 +69,18 @@ object Web3AuthUtils {
             "Solana Devnet" -> context.getString(R.string.sol_view_account)
             "Polygon Mainnet" -> context.getString(R.string.poly_view_account)
             else -> context.getString(R.string.eth_view_account)
+        }
+    }
+
+    fun getTransactionStatusText(context: Context, blockChain: String): String {
+        return when (blockChain) {
+            "ETH Mainnet" -> context.getString(R.string.eth_view_transaction_status)
+            "ETH Goerli" -> context.getString(R.string.eth_view_transaction_status)
+            "Solana Mainnet" -> context.getString(R.string.sol_view_transaction_status)
+            "Solana Testnet" -> context.getString(R.string.sol_view_transaction_status)
+            "Solana Devnet" -> context.getString(R.string.sol_view_transaction_status)
+            "Polygon Mainnet" -> context.getString(R.string.poly_view_transaction_status)
+            else -> context.getString(R.string.eth_view_transaction_status)
         }
     }
 

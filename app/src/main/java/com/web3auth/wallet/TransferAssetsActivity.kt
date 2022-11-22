@@ -245,9 +245,9 @@ class TransferAssetsActivity : AppCompatActivity() {
         if (result.second.isEmpty()) return
         if (::transDialog.isInitialized) transDialog.dismiss()
         if (result.first) {
-            showTransactionDialog(TransactionStatus.SUCCESSFUL)
+            showTransactionDialog(TransactionStatus.SUCCESSFUL, result.second)
         } else {
-            showTransactionDialog(TransactionStatus.FAILED)
+            showTransactionDialog(TransactionStatus.FAILED, result.second)
         }
     }
 
@@ -525,7 +525,7 @@ class TransferAssetsActivity : AppCompatActivity() {
             .plus(" ").plus(getString(R.string.usd))
     }
 
-    private fun showTransactionDialog(transactionStatus: TransactionStatus) {
+    private fun showTransactionDialog(transactionStatus: TransactionStatus, transactionHash: String?) {
         val dialog = Dialog(this@TransferAssetsActivity)
         dialog.setContentView(R.layout.popup_transaction)
         dialog.window?.setLayout(
@@ -550,10 +550,11 @@ class TransferAssetsActivity : AppCompatActivity() {
                 transactionState.text = getString(R.string.transaction_success)
                 ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
                 tvStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
+                val transUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain).plus("tx/").plus(transactionHash)
                 tvStatus.setOnClickListener {
                     Web3AuthUtils.openCustomTabs(
                         this@TransferAssetsActivity,
-                        Web3AuthUtils.getViewTransactionUrl(this, blockChain)
+                        transUrl
                     )
                 }
             }

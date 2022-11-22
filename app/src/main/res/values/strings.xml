@@ -44,8 +44,8 @@
     <string name="polygon_transaction_status_url">https://mumbai.polygonscan.com/</string>
     <string name="eth_transaction_status_url">https://etherscan.io/</string>
     <string name="sol_transaction_status_url">https://explorer.solana.com/</string>
-    <string name="sol_transaction_status_url_testnet">https://explorer.solana.com/?cluster=testnet</string>
-    <string name="sol_transaction_status_url_devnet">https://explorer.solana.com/?cluster=devnet</string>
+    <string name="sol_transaction_status_url_testnet">https://explorer.solana.com/</string>
+    <string name="sol_transaction_status_url_devnet">https://explorer.solana.com/</string>
     <string name="web3Auth_redirection_url">torusapp://org.torusresearch.web3authexample/redirect</string>
     <string name="sign_failed">Sign Failed</string>
     <string name="web3Auth_app_name">Web3Auth Sample App</string>
@@ -94,6 +94,8 @@
     <string name="web3auth_project_id">BASdZxp5tWqPGkzbOU4VMJsnz8QOpJ2pyxf6kZcuxI8AJ1gsOw5MgbW96RpAAx_Kk-5p4rhOopPhCa9kR_9mKpE</string>
     <string name="ethereum">ETH Mainnet</string>
     <string name="solana">Solana</string>
+    <string name="sol_testnet">Solana Testnet</string>
+    <string name="sol_devnet">Solana Devnet</string>
 
 
     <string-array name="networks">
