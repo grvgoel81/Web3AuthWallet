@@ -273,7 +273,8 @@ class MainActivity : AppCompatActivity() {
         tvViewTransactionStatus = findViewById(R.id.tvViewTransactionStatus)
         tvViewTransactionStatus.text = Web3AuthUtils.getAccountViewText(this, blockChain)
         tvViewTransactionStatus.setOnClickListener {
-            var accountUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain).plus("address/").plus(publicAddress)
+            var accountUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain)
+                .plus(getString(R.string.user_account_address)).plus(publicAddress)
             if(blockChain == getString(R.string.sol_testnet)) {
                 accountUrl = accountUrl.plus("?cluster=testnet")
             } else if(blockChain == getString(R.string.sol_devnet)) {

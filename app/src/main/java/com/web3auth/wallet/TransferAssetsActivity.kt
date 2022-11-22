@@ -181,7 +181,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                         publicAddress,
                         etRecipientAddress.text.toString(),
                         etAmountToSend.text.toString(),
-                        gasFee = 0.0000005, processTime = 0.50,
+                        gasFee = 0.0000005, processTime = 0.30,
                         tvTotalAmount.text.toString(),
                         tvCostInETH.text.toString()
                     )
@@ -470,7 +470,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                     sessionID,
                     receiptAdd,
                     totalAmount.split(" ")[0].toDouble(),
-                    intent.getStringExtra(DATA),
+                    "",
                     selectedGasParams
                 )
             }
@@ -550,7 +550,8 @@ class TransferAssetsActivity : AppCompatActivity() {
                 transactionState.text = getString(R.string.transaction_success)
                 ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
                 tvStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
-                val transUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain).plus("tx/").plus(transactionHash)
+                val transUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain)
+                    .plus(getString(R.string.transaction)).plus(transactionHash)
                 tvStatus.setOnClickListener {
                     Web3AuthUtils.openCustomTabs(
                         this@TransferAssetsActivity,

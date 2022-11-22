@@ -96,6 +96,8 @@
     <string name="solana">Solana</string>
     <string name="sol_testnet">Solana Testnet</string>
     <string name="sol_devnet">Solana Devnet</string>
+    <string name="user_account_address">address/</string>
+    <string name="transaction">tx/</string>
 
 
     <string-array name="networks">
