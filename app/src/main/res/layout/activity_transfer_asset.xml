@@ -14,6 +14,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/activity_header_color"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -26,7 +27,7 @@
             android:layout_marginStart="34dp"
             android:layout_marginTop="48dp"
             android:foreground="?android:attr/selectableItemBackground"
-            android:src="@mipmap/ic_arrow_left"
+            android:src="@drawable/ic_arrow_left"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -210,7 +211,7 @@
                         android:layout_toStartOf="@+id/tvUSD"
                         android:background="@drawable/bg_layout_tv_blue"
                         android:text="ETH"
-                        android:textColor="#6F717A" />
+                        android:textColor="@color/text_color" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tvUSD"
@@ -220,8 +221,8 @@
                         android:layout_marginTop="15dp"
                         android:layout_marginEnd="12dp"
                         android:background="@drawable/bg_layout_tv_grey"
-                        android:text="USD"
-                        android:textColor="#6F717A" />
+                        android:text="@string/usd"
+                        android:textColor="@color/text_color" />
 
                 </RelativeLayout>
             </FrameLayout>
@@ -265,6 +266,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvTransactionFee">
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etMaxTransFee"
                     android:layout_width="match_parent"
@@ -274,16 +279,19 @@
                     android:enabled="false"
                     android:hint="Upto 0.00041157"
                     android:paddingLeft="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvSendTo" />
+                    app:layout_constraintStart_toStartOf="parent"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="210dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_edittext_network"
-                    android:text="ETH" />
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_layout_tv_grey"
+                    android:text="ETH"
+                    android:textColor="@color/text_color" />
+
+                </RelativeLayout>
             </FrameLayout>
 
             <androidx.appcompat.widget.AppCompatTextView

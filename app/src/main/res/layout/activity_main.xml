@@ -16,9 +16,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="26dp"
-        android:layout_marginTop="10dp"
         android:layout_marginEnd="2dp"
+        android:background="@color/activity_header_color"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -30,6 +29,8 @@
             android:layout_height="wrap_content"
             android:text="@string/onboarding_header"
             android:textColor="@color/black"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="26dp"
             android:textSize="24sp"
             android:textStyle="bold"
             android:visibility="visible"
@@ -42,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Email"
+            android:layout_marginStart="26dp"
             android:textColor="@color/black"
             android:textSize="16dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -99,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/account_details"
-                android:textColor="#0F1222"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -125,7 +127,7 @@
                 android:drawablePadding="8dp"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textColor="#0F1222"
+                android:textColor="@color/light_black"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -158,7 +160,7 @@
                     android:drawableLeft="@drawable/ic_wifi"
                     android:drawablePadding="5dp"
                     android:text="Ethereum Testnet"
-                    android:textColor="@color/black"
+                    android:textColor="#000000"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -196,6 +198,7 @@
                     android:layout_below="@+id/tvBalance"
                     android:layout_alignParentStart="true"
                     android:layout_marginTop="5dp"
+                    android:textColor="@color/text_color"
                     android:textSize="12sp"
                     tools:text="1 ETH = 268.21 USD" />
 
@@ -207,6 +210,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="35dp"
                     android:textSize="13sp"
+                    android:textColor="@color/text_color"
                     android:visibility="visible"
                     tools:text="= 0.00 USD" />
 
@@ -244,7 +248,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="@string/sign_message_demo"
-                android:textColor="#0F1222"
+                android:textColor="@color/light_black"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -276,7 +280,7 @@
                     android:background="@drawable/bg_layout_grey"
                     android:gravity="top"
                     android:hint="@string/enter_message"
-                    android:textColor="#0F1222"
+                    android:textColor="@color/light_black"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 

@@ -15,6 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/activity_header_color"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -27,7 +28,7 @@
             android:layout_marginStart="34dp"
             android:layout_marginTop="34dp"
             android:foreground="?android:attr/selectableItemBackground"
-            android:src="@mipmap/ic_arrow_left"
+            android:src="@drawable/ic_arrow_left"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -89,7 +90,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="Ethereum Testnet"
-                android:textColor="@color/black"
+                android:textColor="#000000"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 

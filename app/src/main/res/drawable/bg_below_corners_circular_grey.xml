@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/blockchain_settings_bg_color" />
+    <solid android:color="@color/spinner_bg_color" />
     <stroke
-        android:width="3dp"
-        android:color="@color/blockchain_settings_bg_color" />
+        android:width="1dp"
+        android:color="@color/stroke_color" />
     <corners
         android:topLeftRadius="0dp"
         android:topRightRadius="0dp"

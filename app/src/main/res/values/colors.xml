@@ -12,8 +12,18 @@
     <color name="line_separator_color">#D3D3D4</color>
     <color name="line_bg_color">#C4C4C4</color>
     <color name="text_color">#6F717A</color>
+    <color name="dialog_text_color">#5C6C7F</color>
     <color name="sign_msg_txt_color">#B7B8BD</color>
+    <color name="light_black">#0F1222</color>
     <color name="light_grey">#D3D3D3</color>
     <color name="background_color">#F3F3F4</color>
     <color name="blockchain_settings_bg_color">#F9F9FB</color>
+    <color name="spinner_bg_color">#FFFFFF</color>
+    <color name="activity_header_color">#FFFFFF</color>
+    <color name="eth_layout_bg_color">#DADBE3</color>
+    <color name="stroke_color">#FFFFFF</color>
+    <color name="web3Auth_logo_primary_color">#0364FF</color>
+    <color name="web3Auth_logo_secondary_color">#0F1222</color>
+    <color name="confirm_trans_text_color">#5C6C7F</color>
+    <color name="scan_qr_color">#7F8FA4</color>
 </resources>
