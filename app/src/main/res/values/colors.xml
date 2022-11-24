@@ -26,4 +26,5 @@
     <color name="web3Auth_logo_secondary_color">#0F1222</color>
     <color name="confirm_trans_text_color">#5C6C7F</color>
     <color name="scan_qr_color">#7F8FA4</color>
+    <color name="sign_message_rectangular_color">#FFFFFF</color>
 </resources>

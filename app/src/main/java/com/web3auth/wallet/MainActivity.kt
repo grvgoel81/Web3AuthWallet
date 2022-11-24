@@ -372,7 +372,7 @@ class MainActivity : AppCompatActivity() {
             )
         } else {
             tvBalance.text = String.format(
-                "%.6f",
+                "%.4f",
                 Web3AuthUtils.getPriceinUSD(
                     tvBalance.text.toString().toDouble(),
                     priceInUSD.toDouble()
