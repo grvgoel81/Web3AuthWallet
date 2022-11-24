@@ -74,7 +74,7 @@
                 android:text="@string/select_blockchain"
                 android:layout_marginTop="20dp"
                 android:drawablePadding="5dp"
-                android:drawableStart="@drawable/ic_wifi"
+                android:drawableStart="@drawable/ic_settings_wifi"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:textColor="@color/black"
