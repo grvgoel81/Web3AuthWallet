@@ -28,6 +28,7 @@
     <string name="max_transaction_fee">Max Transaction Fee</string>
     <string name="total_cost">Total cost</string>
     <string name="transfer">Transfer</string>
+    <string name="login">Login</string>
     <string name="onboarding_error">OnBoardingError</string>
     <string name="transaction_placed">Transaction Placed</string>
     <string name="transaction_failed">Transaction Failed</string>

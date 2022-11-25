@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Login"
+        android:text="@string/login"
         android:layout_marginStart="53dp"
         android:layout_marginEnd="53dp"
         android:layout_marginTop="48dp"
