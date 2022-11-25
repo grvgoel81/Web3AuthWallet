@@ -115,4 +115,5 @@ const val LOGINTYPE = "loginType"
 const val PRICE_IN_USD = "priceInUSD"
 const val LOGOUT = "logout"
 const val DATA = "data"
+const val ISDARKMODE = "isDarkMode"
 

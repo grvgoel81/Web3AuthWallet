@@ -98,6 +98,8 @@
     <string name="sol_devnet">Solana Devnet</string>
     <string name="user_account_address">address/</string>
     <string name="transaction">tx/</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 
 
     <string-array name="networks">
