@@ -4,14 +4,14 @@
 
     <!-- action button for settings -->
     <item
-        android:title="Settings"
+        android:title="@string/settings"
         android:id="@+id/settings"
         android:icon="@drawable/ic_baseline_settings_24"
         app:showAsAction="never" />
 
     <!-- action button for refresh -->
     <item
-        android:title="Logout"
+        android:title="@string/logout"
         android:id="@+id/logout"
         android:icon="@drawable/ic_logout"
         app:showAsAction="never" />

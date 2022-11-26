@@ -102,6 +102,15 @@
     <string name="transaction">tx/</string>
     <string name="on">En</string>
     <string name="off">Apagado</string>
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="spanish">Spanish</string>
+    <string name="japanese">Japanese</string>
+    <string name="korean">Korean</string>
+    <string name="mandarin">Mandarin</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="language">Idioma</string>
+    <string name="dark_mode">Modo oscuro</string>
 
 
     <string-array name="networks">

@@ -1,5 +1,6 @@
 package com.web3auth.wallet
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -10,14 +11,17 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import com.web3auth.wallet.utils.*
 
+
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var spBlockChain: AutoCompleteTextView
     private lateinit var tvNetwork: AppCompatTextView
     private lateinit var blockChain: String
     private lateinit var network: String
+    private lateinit var language: String
     private lateinit var switchDarkMode: SwitchCompat
     private lateinit var tvDarkModeStatus: AppCompatTextView
+    private lateinit var spLannuage: AutoCompleteTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +35,8 @@ class SettingsActivity : AppCompatActivity() {
         network =
             this.applicationContext.web3AuthWalletPreferences.getString(NETWORK, "Mainnet")
                 .toString()
+        language = this.applicationContext.web3AuthWalletPreferences.getString(LANGUAGE, "English")
+            .toString()
         setData()
         setUpSpinner()
         setUpSwitch()
@@ -47,10 +53,22 @@ class SettingsActivity : AppCompatActivity() {
                 blockchains[position]
             tvNetwork.text = blockchains[position]
         }
+
+        spLannuage.setText(language)
+        val languages = resources.getStringArray(R.array.languages)
+        val langAdapter: ArrayAdapter<String> =
+            ArrayAdapter(this, R.layout.item_dropdown, languages)
+        spLannuage.setAdapter(langAdapter)
+        spLannuage.setOnItemClickListener { _, _, position, _ ->
+            this.applicationContext.web3AuthWalletPreferences[LANGUAGE] =
+                languages[position]
+            restartApp()
+        }
     }
 
     private fun setData() {
         spBlockChain = findViewById(R.id.spBlockChain)
+        spLannuage = findViewById(R.id.spLanguage)
         tvNetwork = findViewById(R.id.tvNetwork)
         switchDarkMode = findViewById(R.id.switchDarkMode)
         tvDarkModeStatus = findViewById(R.id.tvDarkModeStatus)
@@ -77,5 +95,13 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun restartApp() {
+        val intent = Intent(this, SplashActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+        Runtime.getRuntime().exit(0)
+    }
+
 
 }

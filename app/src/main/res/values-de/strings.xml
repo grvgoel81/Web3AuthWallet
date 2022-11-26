@@ -102,7 +102,15 @@
     <string name="transaction">tx/</string>
     <string name="on">An</string>
     <string name="off">Aus</string>
-
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="spanish">Spanish</string>
+    <string name="japanese">Japanese</string>
+    <string name="korean">Korean</string>
+    <string name="mandarin">Mandarin</string>
+    <string name="logout">Ausloggen</string>
+    <string name="language">Ausloggen</string>
+    <string name="dark_mode">Dunkler Modus</string>
 
     <string-array name="networks">
         <item>Mainnet</item>

@@ -1,15 +1,15 @@
 package com.web3auth.wallet
 
+import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.web3auth.wallet.utils.ISLOGGEDIN
-import com.web3auth.wallet.utils.ISONBOARDED
-import com.web3auth.wallet.utils.get
-import com.web3auth.wallet.utils.web3AuthWalletPreferences
+import com.web3auth.wallet.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 class SplashActivity : AppCompatActivity() {
 
@@ -17,6 +17,10 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         supportActionBar?.hide()
+        val language =
+            this.applicationContext.web3AuthWalletPreferences.getString(LANGUAGE, "English")
+                .toString()
+        setLang(language)
         GlobalScope.launch {
             delay(500)
             navigate()
@@ -36,5 +40,27 @@ class SplashActivity : AppCompatActivity() {
         }
         startActivity(intent)
         finish()
+    }
+
+    private fun setLang(language: String) {
+        when (language) {
+            getString(R.string.english) -> setLocale(this, "en")
+            getString(R.string.german) -> setLocale(this, "de")
+            getString(R.string.spanish) -> setLocale(this, "es")
+            getString(R.string.japanese) -> setLocale(this, "ja")
+            getString(R.string.korean) -> setLocale(this, "ko")
+            getString(R.string.mandarin) -> setLocale(this, "zh")
+        }
+    }
+
+    private fun setLocale(activity: Activity, lang: String?) {
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.locale = locale
+        baseContext.resources.updateConfiguration(
+            config,
+            baseContext.resources.displayMetrics
+        )
     }
 }

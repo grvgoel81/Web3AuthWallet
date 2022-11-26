@@ -101,12 +101,30 @@
     <string name="transaction">tx/</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="spanish">Spanish</string>
+    <string name="japanese">Japanese</string>
+    <string name="korean">Korean</string>
+    <string name="mandarin">Mandarin</string>
+    <string name="logout">Logout</string>
+    <string name="language">Language</string>
+    <string name="dark_mode">Dark Mode</string>
 
 
     <string-array name="networks">
         <item>Mainnet</item>
         <item>Testnet</item>
         <item>Cyan</item>
+    </string-array>
+
+    <string-array name="languages">
+        <item>English</item>
+        <item>German</item>
+        <item>Spanish</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Mandarin</item>
     </string-array>
 
     <string-array name="blockchains">

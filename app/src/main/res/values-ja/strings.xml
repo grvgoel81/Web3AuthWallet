@@ -102,7 +102,15 @@
     <string name="transaction">tx/</string>
     <string name="on">の上</string>
     <string name="off">オフ</string>
-
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="spanish">Spanish</string>
+    <string name="japanese">Japanese</string>
+    <string name="korean">Korean</string>
+    <string name="mandarin">Mandarin</string>
+    <string name="logout">ログアウト</string>
+    <string name="language">言語</string>
+    <string name="dark_mode">ダークモード</string>
 
     <string-array name="networks">
         <item>Mainnet</item>
