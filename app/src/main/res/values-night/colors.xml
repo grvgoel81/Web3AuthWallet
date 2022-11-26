@@ -27,4 +27,5 @@
     <color name="confirm_trans_text_color">#B7B8BD</color>
     <color name="scan_qr_color">#FFFFFF</color>
     <color name="sign_message_rectangular_color">#272930</color>
+    <color name="btn_stroke_color">#6F717A</color>
 </resources>
