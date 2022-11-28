@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.web3auth.wallet.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -15,6 +16,9 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val isDarkMode =
+            this.applicationContext.web3AuthWalletPreferences.getBoolean(ISDARKMODE, true)
+        setTheme(isDarkMode)
         setContentView(R.layout.activity_splash)
         supportActionBar?.hide()
         val language =
@@ -40,6 +44,14 @@ class SplashActivity : AppCompatActivity() {
         }
         startActivity(intent)
         finish()
+    }
+
+    private fun setTheme(isDarkMode: Boolean) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
     }
 
     private fun setLang(language: String) {
