@@ -153,11 +153,8 @@ class OnBoardingActivity : AppCompatActivity() {
         web3Auth.setResultUrl(intent.data)
 
         val sessionResponse: CompletableFuture<Web3AuthResponse> = web3Auth.sessionResponse()
-        print("SESSION MANAGEMENT");
-        print(sessionResponse);
         sessionResponse.whenComplete { loginResponse, error ->
             if (error == null) {
-                print("LOGIN RESPONSE $loginResponse")
                 this.applicationContext.web3AuthWalletPreferences[LOGIN_RESPONSE] =
                     loginResponse
                 this.applicationContext.web3AuthWalletPreferences[ED25519Key] =
@@ -189,7 +186,6 @@ class OnBoardingActivity : AppCompatActivity() {
         )
         loginCompletableFuture.whenComplete { loginResponse, error ->
             if (error == null) {
-                println("LOGIN RESPONSE $loginResponse")
                 this.applicationContext.web3AuthWalletPreferences[LOGIN_RESPONSE] =
                     loginResponse
                 this.applicationContext.web3AuthWalletPreferences[ED25519Key] =
