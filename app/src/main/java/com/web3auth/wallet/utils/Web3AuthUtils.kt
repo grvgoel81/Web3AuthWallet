@@ -193,7 +193,7 @@ object Web3AuthUtils {
         }
     }
 
-    fun getSystemLocale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    fun getSystemLocale(): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         LocaleList.getDefault().get(0).language
     } else {
         Locale.getDefault().language

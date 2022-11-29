@@ -466,13 +466,17 @@ class TransferAssetsActivity : AppCompatActivity() {
                     intent.getStringExtra(DATA)
                 )
             } else {
-                ethereumViewModel.sendTransaction(
-                    sessionID,
-                    receiptAdd,
-                    totalAmount.split(" ")[0].toDouble(),
-                    "",
-                    selectedGasParams
-                )
+                if (this::selectedGasParams.isInitialized) {
+                    ethereumViewModel.sendTransaction(
+                        sessionID,
+                        receiptAdd,
+                        totalAmount.split(" ")[0].toDouble(),
+                        "",
+                        selectedGasParams
+                    )
+                } else {
+                    toast(getString(R.string.something_went_wrong_try_later))
+                }
             }
         }
         tvCancel.setOnClickListener {
