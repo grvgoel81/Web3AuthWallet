@@ -397,9 +397,7 @@ class TransferAssetsActivity : AppCompatActivity() {
     }
 
     private fun setGasParams(params: Params) {
-        if (params != null) {
-            selectedGasParams = params
-        }
+        selectedGasParams = params
     }
 
     private fun showConfirmTransactionDialog(
@@ -475,6 +473,7 @@ class TransferAssetsActivity : AppCompatActivity() {
                         selectedGasParams
                     )
                 } else {
+                    if (::transDialog.isInitialized) transDialog.dismiss()
                     toast(getString(R.string.something_went_wrong_try_later))
                 }
             }
