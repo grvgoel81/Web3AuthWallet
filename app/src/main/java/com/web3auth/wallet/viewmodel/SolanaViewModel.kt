@@ -32,8 +32,6 @@ class SolanaViewModel : ViewModel() {
     fun setNetwork(cluster: Cluster, ed25519Key: String) {
         client = RpcClient(cluster)
         account = org.p2p.solanaj.core.Account(ed25519Key.toByteArray(StandardCharsets.UTF_8))
-        println("ed25519Key: $ed25519Key")
-        println("Solana Pub Key: " + account.publicKey.toBase58())
         val pubKey = account.publicKey.toBase58()
         val secretKey = Base58.encode(account.secretKey)
     }

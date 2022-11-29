@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
+import android.os.LocaleList
 import androidx.browser.customtabs.CustomTabsIntent
 import com.web3auth.core.getCustomTabsBrowsers
 import com.web3auth.core.getDefaultBrowser
@@ -11,6 +13,7 @@ import com.web3auth.wallet.R
 import org.web3j.crypto.ECKeyPair
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.*
 import kotlin.math.pow
 
 object Web3AuthUtils {
@@ -188,5 +191,11 @@ object Web3AuthUtils {
             context.getString(R.string.twitch) -> R.drawable.ic_twitch_inactive
             else -> R.drawable.iv_google
         }
+    }
+
+    fun getSystemLocale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        LocaleList.getDefault().get(0).language
+    } else {
+        Locale.getDefault().language
     }
 }

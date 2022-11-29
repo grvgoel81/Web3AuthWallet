@@ -117,4 +117,5 @@ const val LOGOUT = "logout"
 const val DATA = "data"
 const val ISDARKMODE = "isDarkMode"
 const val LANGUAGE = "language"
+const val IS_LANGUAGE_CHANGED = "isLanguageChanged"
 
