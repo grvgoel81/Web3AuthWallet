@@ -111,7 +111,7 @@
     <string name="mandarin">Mandarin</string>
     <string name="logout">Ausloggen</string>
     <string name="language">Ausloggen</string>
-    <string name="dark_mode">Dunkler Modus</string>
+    <string name="theme">Thema</string>
 
     <string-array name="networks">
         <item>Mainnet</item>

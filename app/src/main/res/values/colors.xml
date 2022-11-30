@@ -28,4 +28,5 @@
     <color name="scan_qr_color">#7F8FA4</color>
     <color name="sign_message_rectangular_color">#FFFFFF</color>
     <color name="btn_stroke_color">#6F717A</color>
+    <color name="blockchain_bg_color">#D3D3D3</color>
 </resources>
