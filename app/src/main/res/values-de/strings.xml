@@ -26,7 +26,7 @@
     <string name="amount">Menge</string>
     <string name="send_all">Sende alle</string>
     <string name="edit">Bearbeiten</string>
-    <string name="max_transaction_fee">Maximale Transaktionsgebühr</string>
+    <string name="max_transaction_fee">Maximale Transaktion Fee</string>
     <string name="total_cost">Gesamtkosten</string>
     <string name="transfer">Transfer</string>
     <string name="login">Anmeldung</string>
