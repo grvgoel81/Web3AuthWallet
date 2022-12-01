@@ -574,8 +574,13 @@ class TransferAssetsActivity : AppCompatActivity() {
                 transactionState.text = getString(R.string.transaction_success)
                 ivState.setImageDrawable(getDrawable(R.drawable.ic_iv_transaction_success))
                 tvStatus.text = Web3AuthUtils.getTransactionStatusText(this, blockChain)
-                val transUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain)
+                var transUrl = Web3AuthUtils.getViewTransactionUrl(this, blockChain)
                     .plus(getString(R.string.transaction)).plus(transactionHash)
+                if (blockChain == getString(R.string.sol_testnet)) {
+                    transUrl = transUrl.plus("?cluster=testnet")
+                } else if (blockChain == getString(R.string.sol_devnet)) {
+                    transUrl = transUrl.plus("?cluster=devnet")
+                }
                 tvStatus.setOnClickListener {
                     Web3AuthUtils.openCustomTabs(
                         this@TransferAssetsActivity,
