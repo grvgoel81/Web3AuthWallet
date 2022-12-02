@@ -210,6 +210,12 @@ class TransferAssetsActivity : AppCompatActivity() {
         }
 
         if (blockChain.contains(getString(R.string.solana))) {
+            solanaViewModel.error.observe(this) {
+                if (it) {
+                    toast(getString(R.string.something_went_wrong))
+                }
+            }
+
             solanaViewModel.sendTransactionResult.observe(this) {
                 observeTransactionResult(it)
             }
@@ -233,6 +239,12 @@ class TransferAssetsActivity : AppCompatActivity() {
                 if (it != null) {
                     gasApiResponse = it
                     it.high?.let { it1 -> setGasParams(it1) }
+                }
+            }
+
+            ethereumViewModel.error.observe(this) {
+                if (it) {
+                    toast(getString(R.string.something_went_wrong))
                 }
             }
         }

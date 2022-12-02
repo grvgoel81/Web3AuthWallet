@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.*
@@ -24,12 +23,14 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.MultiFormatWriter
 import com.google.zxing.qrcode.QRCodeWriter
-import com.web3auth.core.Web3Auth
-import com.web3auth.core.types.Web3AuthOptions
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.web3auth.core.types.Web3AuthResponse
-import com.web3auth.core.types.WhiteLabelData
 import com.web3auth.wallet.utils.*
 import com.web3auth.wallet.viewmodel.EthereumViewModel
 import com.web3auth.wallet.viewmodel.SolanaViewModel
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private var balance: Long = 0L
     private lateinit var etMessage: AppCompatEditText
     private lateinit var btnSign: AppCompatButton
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var tvBalance: AppCompatTextView
     private lateinit var tvNetwork: AppCompatTextView
     private lateinit var tvPriceInUSD: AppCompatTextView
@@ -157,6 +159,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            ethereumViewModel.error.observe(this) {
+                if (it) {
+                    toast(getString(R.string.something_went_wrong))
+                }
+            }
+
             ethereumViewModel.publicAddress.observe(this) {
                 publicAddress = it
                 findViewById<AppCompatTextView>(R.id.tvAddress).text =
@@ -214,6 +222,11 @@ class MainActivity : AppCompatActivity() {
                     showSignatureResult(it)
                 }
             }
+            solanaViewModel.error.observe(this) {
+                if (it) {
+                    toast(getString(R.string.something_went_wrong))
+                }
+            }
         }
     }
 
@@ -223,6 +236,7 @@ class MainActivity : AppCompatActivity() {
         btnSign = findViewById(R.id.btnSign)
         tvBalance = findViewById(R.id.tvBalance)
         tvPriceInUSD = findViewById(R.id.tvPriceInUSD)
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh)
         findViewById<AppCompatButton>(R.id.btnTransfer).setOnClickListener {
             if (tvBalance.text.toString().toDouble().compareTo(0.0) == 0) {
                 toast(getString(R.string.insufficient_balance))
@@ -261,6 +275,11 @@ class MainActivity : AppCompatActivity() {
                 )
                 showSignatureResult(signatureHash)
             }
+        }
+
+        swipeRefreshLayout.setOnRefreshListener {
+            init()
+            swipeRefreshLayout.isRefreshing = false
         }
     }
 
@@ -341,18 +360,11 @@ class MainActivity : AppCompatActivity() {
         tvAddress.text = publicAddress
         tvAddress.setOnClickListener { copyToClipboard(tvAddress.text.toString()) }
 
-        val writer = QRCodeWriter()
-        val bitMatrix = writer.encode(publicAddress, BarcodeFormat.QR_CODE, 200, 200)
-        val w = bitMatrix.width
-        val h = bitMatrix.height
-        val pixels = IntArray(w * h)
-        for (y in 0 until h) {
-            for (x in 0 until w) {
-                pixels[y * w + x] = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
-            }
-        }
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(pixels, 0, w, 0, 0, w, h)
+        val writer = MultiFormatWriter()
+        val hintMap = mapOf(EncodeHintType.MARGIN to 0)
+        val bitMatrix = writer.encode(publicAddress, BarcodeFormat.QR_CODE, 200, 200, hintMap)
+        val barcodeEncoder = BarcodeEncoder()
+        val bitmap = barcodeEncoder.createBitmap(bitMatrix)
         ivQR.setImageBitmap(bitmap)
 
         ivClose.setOnClickListener {

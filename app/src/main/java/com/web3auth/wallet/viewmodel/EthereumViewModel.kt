@@ -37,6 +37,7 @@ class EthereumViewModel : ViewModel() {
     var ethGasAPIResponse: MutableLiveData<EthGasAPIResponse> = MutableLiveData(null)
     var transactionHash = MutableLiveData(Pair(false, ""))
     var gasAPIResponse: MutableLiveData<GasApiResponse> = MutableLiveData(null)
+    var error: MutableLiveData<Boolean> = MutableLiveData(false)
 
     init {
         getMaxTransactionConfig()
@@ -49,6 +50,7 @@ class EthereumViewModel : ViewModel() {
             val clientVersion: Web3ClientVersion = web3.web3ClientVersion().sendAsync().get()
             isWeb3Configured.value = !clientVersion.hasError()
         } catch (e: Exception) {
+            error.value = true
             e.printStackTrace()
         }
     }
@@ -78,6 +80,7 @@ class EthereumViewModel : ViewModel() {
                     .get()
                 balance.postValue(web3Balance.balance.toDouble())
             } catch (ex: Exception) {
+                error.value = true
                 ex.printStackTrace()
             }
         }
@@ -131,7 +134,7 @@ class EthereumViewModel : ViewModel() {
                 val value: BigInteger =
                     Convert.toWei(amountToBeSent.toString(), Convert.Unit.ETHER).toBigInteger()
                 val gasLimit: BigInteger = BigInteger.valueOf(21000)
-                val gasFee = web3.ethGasPrice().send().gasPrice
+                web3.ethGasPrice().send().gasPrice
                 val chainId = withContext(Dispatchers.IO) {
                     web3.ethChainId().sendAsync().get()
                 }
@@ -159,6 +162,7 @@ class EthereumViewModel : ViewModel() {
                     transactionHash.postValue(Pair(true, ethSendTransaction.transactionHash))
                 }
             } catch (ex: Exception) {
+                error.value = true
                 ex.printStackTrace()
             }
         }

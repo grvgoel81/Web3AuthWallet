@@ -114,16 +114,6 @@ object Web3AuthUtils {
         return decimalWei / getEtherInGwei()
     }
 
-    fun getPrivateKey(sessionId: String): String {
-        val derivedECKeyPair: ECKeyPair = ECKeyPair.create(BigInteger(sessionId, 16))
-        return derivedECKeyPair.privateKey.toString(16)
-    }
-
-    fun getPublicKey(sessionId: String): String {
-        val derivedECKeyPair: ECKeyPair = ECKeyPair.create(BigInteger(sessionId, 16))
-        return derivedECKeyPair.publicKey.toString(16)
-    }
-
     fun isValidEthAddress(address: String): Boolean {
         val ethAddressRegex = Regex(pattern = "^0x[a-fA-F0-9]{40}$")
         return ethAddressRegex.matches(input = address)

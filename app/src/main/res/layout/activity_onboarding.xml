@@ -38,23 +38,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:text="@string/onboarding_header"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:textSize="24sp"
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/onboarding_sub_header"
-            android:textSize="16dp"
+            android:textSize="16sp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:textColor="@color/text_color"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvHeading"/>
+            app:layout_constraintTop_toBottomOf="@+id/tvHeading" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -133,7 +137,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_expand_arrow"
-            android:foreground="?android:attr/selectableItemBackground"
             android:layout_marginStart="12dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_circular"

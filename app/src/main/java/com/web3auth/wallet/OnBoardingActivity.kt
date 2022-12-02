@@ -152,7 +152,7 @@ class OnBoardingActivity : AppCompatActivity() {
 
         web3Auth.setResultUrl(intent.data)
 
-        val sessionResponse: CompletableFuture<Web3AuthResponse> = web3Auth.sessionResponse()
+       val sessionResponse: CompletableFuture<Web3AuthResponse> = web3Auth.sessionResponse()
         sessionResponse.whenComplete { loginResponse, error ->
             if (error == null) {
                 this.applicationContext.web3AuthWalletPreferences[LOGIN_RESPONSE] =
@@ -237,7 +237,7 @@ class OnBoardingActivity : AppCompatActivity() {
 
         a.duration = (targetHeight / v.context.resources.displayMetrics.density).toInt().toLong()
         v.startAnimation(a)
-        ivFullLogin.setImageDrawable(getDrawable(R.drawable.ic_collapse_arrow))
+        ivFullLogin.animate().rotationBy(180F).setDuration(300).start()
     }
 
     private fun collapse(v: View) {
@@ -259,6 +259,6 @@ class OnBoardingActivity : AppCompatActivity() {
         }
         a.duration = (initialHeight / v.context.resources.displayMetrics.density).toInt().toLong()
         v.startAnimation(a)
-        ivFullLogin.setImageDrawable(getDrawable(R.drawable.ic_expand_arrow))
+        ivFullLogin.animate().rotationBy(180F).setDuration(300).start()
     }
 }
