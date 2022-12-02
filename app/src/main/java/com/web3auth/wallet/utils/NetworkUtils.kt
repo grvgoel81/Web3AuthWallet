@@ -2,7 +2,6 @@ package com.web3auth.wallet.utils
 
 import com.web3auth.core.Web3Auth
 import org.p2p.solanaj.rpc.Cluster
-import org.torusresearch.fetchnodedetails.types.TorusNetwork
 
 object NetworkUtils {
 
@@ -12,14 +11,6 @@ object NetworkUtils {
             "Testnet" -> Web3Auth.Network.TESTNET
             "Cyan" -> Web3Auth.Network.CYAN
             else -> Web3Auth.Network.MAINNET
-        }
-    }
-
-    fun getTorusNetwork(network: String): TorusNetwork {
-        return when (network) {
-            "Mainnet" -> TorusNetwork.MAINNET
-            "Testnet" -> TorusNetwork.TESTNET
-            else -> TorusNetwork.MAINNET
         }
     }
 
