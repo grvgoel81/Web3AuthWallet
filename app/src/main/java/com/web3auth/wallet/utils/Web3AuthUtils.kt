@@ -6,15 +6,15 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
+import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import com.web3auth.core.getCustomTabsBrowsers
 import com.web3auth.core.getDefaultBrowser
 import com.web3auth.wallet.R
-import org.web3j.crypto.ECKeyPair
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.util.*
 import kotlin.math.pow
+
 
 object Web3AuthUtils {
 
@@ -105,12 +105,12 @@ object Web3AuthUtils {
     private fun getEtherInGwei() = 10.0.pow(10)
 
     fun toWeiEther(ethBalance: Double): Double {
-        var decimalWei = ethBalance
+        val decimalWei = ethBalance
         return decimalWei / getEtherInWei()
     }
 
     private fun toGwieEther(balance: BigDecimal): Double {
-        var decimalWei = balance.toDouble()
+        val decimalWei = balance.toDouble()
         return decimalWei / getEtherInGwei()
     }
 
@@ -154,13 +154,21 @@ object Web3AuthUtils {
     fun openCustomTabs(context: Context, url: String) {
         val defaultBrowser = context.getDefaultBrowser()
         val customTabsBrowsers = context.getCustomTabsBrowsers()
+        val otherParams = CustomTabColorSchemeParams.Builder()
+            .setToolbarColor(context.getColor(R.color.background_color))
+            .setNavigationBarColor(context.getColor(R.color.background_color))
+            .build()
 
         if (customTabsBrowsers.contains(defaultBrowser)) {
-            val customTabs = CustomTabsIntent.Builder().build()
+            val customTabs = CustomTabsIntent.Builder()
+                .setDefaultColorSchemeParams(otherParams)
+                .build()
             customTabs.intent.setPackage(defaultBrowser)
             customTabs.launchUrl(context, Uri.parse(url))
         } else if (customTabsBrowsers.isNotEmpty()) {
-            val customTabs = CustomTabsIntent.Builder().build()
+            val customTabs = CustomTabsIntent.Builder()
+                .setDefaultColorSchemeParams(otherParams)
+                .build()
             customTabs.intent.setPackage(customTabsBrowsers[0])
             customTabs.launchUrl(context, Uri.parse(url))
         }
