@@ -80,7 +80,6 @@ class EthereumViewModel : ViewModel() {
                     .get()
                 balance.postValue(web3Balance.balance.toDouble())
             } catch (ex: Exception) {
-                error.postValue(true)
                 ex.printStackTrace()
             }
         }
