@@ -40,7 +40,7 @@ class SolanaViewModel : ViewModel() {
             publicAddress.postValue(account.publicKey.toBase58())
             privateKey.postValue(Base58.encode(account.secretKey))
         } catch (ex: Exception) {
-            error.value = true
+            error.postValue(true)
             ex.printStackTrace()
         }
     }
