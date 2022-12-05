@@ -1,4 +1,4 @@
-# Web3Auth Android Sample
+# Web3Auth Android Wallet
 
 Example of using [Web3Auth Android SDK].
 
