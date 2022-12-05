@@ -14,7 +14,7 @@ of [Web3Auth Android SDK] including authentication using social logins like Goog
 
 ### App Architecture
 
-<img height="500" width="500" src=https://github.com/Web3Auth/web3auth-android-sample/blob/master/app/src/debug/assets/Web3Auth_wallet.png" />
+<img height="500" width="500" src="https://github.com/Web3Auth/web3auth-android-sample/blob/master/app/src/debug/assets/Web3Auth_wallet.png" />
    
 
 <!-- Links -->
