@@ -270,7 +270,11 @@ class MainActivity : AppCompatActivity() {
                     web3AuthResponse?.sessionId.toString(),
                     msg
                 )
-                showSignatureResult(signatureHash)
+                if (signatureHash == "error") {
+                    toast(getString(R.string.something_went_wrong))
+                } else {
+                    showSignatureResult(signatureHash)
+                }
             }
         }
 

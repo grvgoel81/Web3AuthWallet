@@ -86,13 +86,17 @@ class EthereumViewModel : ViewModel() {
     }
 
     fun getSignature(privateKey: String, message: String): String {
-        val credentials: Credentials = Credentials.create(privateKey)
-        val hashedData = Hash.sha3(message.toByteArray(StandardCharsets.UTF_8))
-        val signature = Sign.signMessage(hashedData, credentials.ecKeyPair)
-        val r = Numeric.toHexString(signature.r)
-        val s = Numeric.toHexString(signature.s).substring(2)
-        val v = Numeric.toHexString(signature.v).substring(2)
-        return StringBuilder(r).append(s).append(v).toString()
+        return try {
+            val credentials: Credentials = Credentials.create(privateKey)
+            val hashedData = Hash.sha3(message.toByteArray(StandardCharsets.UTF_8))
+            val signature = Sign.signMessage(hashedData, credentials.ecKeyPair)
+            val r = Numeric.toHexString(signature.r)
+            val s = Numeric.toHexString(signature.s).substring(2)
+            val v = Numeric.toHexString(signature.v).substring(2)
+            StringBuilder(r).append(s).append(v).toString()
+        } catch (ex: Exception) {
+            "error"
+        }
     }
 
     private fun getMaxTransactionConfig() {
