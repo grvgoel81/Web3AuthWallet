@@ -267,7 +267,7 @@ class MainActivity : AppCompatActivity() {
                 solanaViewModel.signTransaction(NetworkUtils.getSolanaNetwork(blockChain), msg)
             } else {
                 val signatureHash = ethereumViewModel.getSignature(
-                    web3AuthResponse?.sessionId.toString(),
+                    sessionID,
                     msg
                 )
                 if (signatureHash == "error") {
