@@ -275,13 +275,13 @@ class TransferAssetsActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@TransferAssetsActivity,
                     getString(R.string.cancelled),
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
                 Toast.makeText(
                     this@TransferAssetsActivity,
                     getString(R.string.denied_camera_permission),
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         } else {

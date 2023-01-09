@@ -67,6 +67,7 @@ object Web3AuthUtils {
         return when (blockChain) {
             "ETH Mainnet" -> context.getString(R.string.eth_view_account)
             "ETH Goerli" -> context.getString(R.string.eth_view_account)
+            "Binance Mainnet" -> context.getString(R.string.bnb_view_transaction_status)
             "Solana Mainnet" -> context.getString(R.string.sol_view_account)
             "Solana Testnet" -> context.getString(R.string.sol_view_account)
             "Solana Devnet" -> context.getString(R.string.sol_view_account)
@@ -79,6 +80,7 @@ object Web3AuthUtils {
         return when (blockChain) {
             "ETH Mainnet" -> context.getString(R.string.eth_view_transaction_status)
             "ETH Goerli" -> context.getString(R.string.eth_view_transaction_status)
+            "Binance Mainnet" -> context.getString(R.string.bnb_view_transaction_status)
             "Solana Mainnet" -> context.getString(R.string.sol_view_transaction_status)
             "Solana Testnet" -> context.getString(R.string.sol_view_transaction_status)
             "Solana Devnet" -> context.getString(R.string.sol_view_transaction_status)
@@ -91,7 +93,7 @@ object Web3AuthUtils {
         return when (blockChain) {
             "ETH Mainnet" -> context.getString(R.string.eth_transaction_status_url)
             "Polygon Mainnet" -> context.getString(R.string.polygon_transaction_status_url)
-            "Binance Mainnet" -> "BNB"
+            "Binance Mainnet" -> "https://bscscan.com/"
             "ETH Goerli" -> context.getString(R.string.eth_transaction_status_url)
             "Solana Mainnet" -> context.getString(R.string.sol_transaction_status_url)
             "Solana Testnet" -> context.getString(R.string.sol_transaction_status_url_testnet)
