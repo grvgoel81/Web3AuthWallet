@@ -107,8 +107,7 @@ object Web3AuthUtils {
     private fun getEtherInGwei() = 10.0.pow(10)
 
     fun toWeiEther(ethBalance: Double): Double {
-        val decimalWei = ethBalance
-        return decimalWei / getEtherInWei()
+        return ethBalance / getEtherInWei()
     }
 
     private fun toGwieEther(balance: BigDecimal): Double {
