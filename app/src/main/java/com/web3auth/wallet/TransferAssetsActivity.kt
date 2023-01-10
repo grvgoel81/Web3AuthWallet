@@ -244,6 +244,7 @@ class TransferAssetsActivity : AppCompatActivity() {
 
             ethereumViewModel.error.observe(this) {
                 if (it) {
+                    if (::transDialog.isInitialized) transDialog.dismiss()
                     toast(getString(R.string.something_went_wrong))
                 }
             }

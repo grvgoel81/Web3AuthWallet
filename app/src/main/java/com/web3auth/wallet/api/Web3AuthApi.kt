@@ -5,15 +5,20 @@ import com.web3auth.wallet.api.models.GasApiResponse
 import com.web3auth.wallet.api.models.PriceResponse
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
+import java.math.BigInteger
 
 interface Web3AuthApi {
     @GET("/currency")
-    suspend fun getCurrencyPrice(@Query("fsym") fsym: String, @Query("tsyms") tsyms: String): Response<PriceResponse>
+    suspend fun getCurrencyPrice(
+        @Query("fsym") fsym: String,
+        @Query("tsyms") tsyms: String
+    ): Response<PriceResponse>
 
     @GET("api/ethgasAPI.json")
     suspend fun getMaxTransactionConfig(): Response<EthGasAPIResponse>
 
-    @GET(".")
-    suspend fun getGasConfig(): Response<GasApiResponse>
+    @GET("/networks/{chain_id}/suggestedGasFees")
+    suspend fun getGasConfig(@Path("chain_id") chainId: BigInteger): Response<GasApiResponse>
 }
