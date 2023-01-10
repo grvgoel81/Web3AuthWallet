@@ -152,9 +152,8 @@ class EthereumViewModel : ViewModel() {
                     recipientAddress,
                     value,
                     data ?: "",
-                    BigInteger.valueOf(params.suggestedMaxPriorityFeePerGas?.toLong() ?: 2000),
-                    params.suggestedMaxFeePerGas?.get(0)?.code?.toLong()?.toBigInteger()
-                        ?: BigInteger.valueOf(50000)
+                    web3.ethGasPrice().send().gasPrice,
+                    web3.ethGasPrice().send().gasPrice
                 )
 
                 // Sign the transaction
